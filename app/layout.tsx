@@ -42,13 +42,15 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         <header className="border-b border-border bg-surface">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-4">
             {/* The name is too wide to share a line with the nav at 375px, so
-                it gets its own row with the toggle. */}
+                it gets its own row with the toggle. It is allowed to wrap
+                rather than crowd the toggle on a 320px phone, which is the
+                narrowest any of us is likely to hold. */}
             <div className="flex items-center justify-between gap-3">
               <Link
                 href="/"
-                className="whitespace-nowrap text-lg font-bold tracking-tight"
+                className="text-lg font-bold leading-tight tracking-tight text-balance"
               >
-                HoloPicks Duel
+                2026-2027 HoloPicks NFL Duel
               </Link>
               <ThemeToggle />
             </div>
