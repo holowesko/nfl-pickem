@@ -114,7 +114,15 @@ does not.
 | `CRON_SECRET` | Vercel + GitHub | Shared bearer token for the sync endpoint |
 | `APP_URL` | GitHub | Deployed base URL, e.g. `https://picks.vercel.app` |
 
-## Privacy
+## Who can see what
 
 There is no authentication. The pool lives at an unlisted URL and is marked
-`noindex`. Everyone can see everyone&rsquo;s picks at all times, by design.
+`noindex`.
+
+Between players, each game's picks are hidden until that game kicks off, then
+revealed. Before kickoff you can see *that* someone has picked, never *what*
+they picked — so the last person to pick gains nothing.
+
+That filtering happens server-side in `app/page.tsx`, before the props are
+built. Hidden picks are never serialised into the page at all; hiding them
+inside the component would still ship them to the browser.

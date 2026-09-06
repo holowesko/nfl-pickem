@@ -39,6 +39,7 @@ export function GameCard({
   isLock,
   isUpset,
   others,
+  othersIn,
   canPick,
 }: {
   game: GameCardData
@@ -46,6 +47,8 @@ export function GameCard({
   isLock: boolean
   isUpset: boolean
   others: OtherPick[]
+  /** Count of other players who have picked but are still hidden. */
+  othersIn: number
   canPick: boolean
 }) {
   const [pending, startTransition] = useTransition()
@@ -188,6 +191,12 @@ export function GameCard({
             </span>
           ))}
         </div>
+      ) : othersIn > 0 ? (
+        // Who has picked is fair game; what they picked is not, until kickoff.
+        <p className="mt-3 border-t border-border pt-2 text-xs text-muted">
+          {othersIn === 1 ? '1 other is in' : `${othersIn} others are in`} &middot; picks
+          revealed at kickoff
+        </p>
       ) : null}
 
       {error ? <p className="mt-2 text-xs text-red-500">{error}</p> : null}

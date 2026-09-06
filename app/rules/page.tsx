@@ -95,7 +95,10 @@ export default function RulesPage() {
           <li>A push — the result landing exactly on the number — scores 0 for everyone.</li>
           <li>Miss a kickoff and that game simply scores 0. Nothing is auto-picked.</li>
           <li>The Lock and the Upset are optional, and may both sit on the same game.</li>
-          <li>Everyone can see everyone&rsquo;s picks, at all times. Pick accordingly.</li>
+          <li>
+            Each game&rsquo;s picks are hidden until that game kicks off. You can see who
+            is in, never what they took. Then everything opens up.
+          </li>
           <li>Most points across the 18-week regular season wins. A tie is a shared title.</li>
         </ul>
       </section>

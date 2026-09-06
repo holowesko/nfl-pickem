@@ -105,15 +105,26 @@ export default async function ThisWeekPage() {
             <div className="grid gap-2">
               {group.games.map((game) => {
                 const mine = myPicks.get(game.id)
-                const others: OtherPick[] = picks
-                  .filter((p) => p.gameId === game.id && p.playerId !== player?.id)
-                  .map((p) => ({
-                    playerId: p.playerId,
-                    playerName: PLAYERS.find((x) => x.id === p.playerId)?.name ?? p.playerId,
-                    side: p.side,
-                    isLock: p.isLock,
-                    isUpset: p.isUpset,
-                  }))
+
+                // Other players' picks stay hidden until this game kicks off.
+                // The filtering happens here, on the server, so the hidden
+                // picks are never serialised into the page at all — hiding
+                // them in the component would still ship them to the browser
+                // for anyone curious enough to read the source.
+                const revealed = arePicksClosed(new Date(game.kickoff))
+                const theirs = picks.filter(
+                  (p) => p.gameId === game.id && p.playerId !== player?.id
+                )
+                const others: OtherPick[] = revealed
+                  ? theirs.map((p) => ({
+                      playerId: p.playerId,
+                      playerName:
+                        PLAYERS.find((x) => x.id === p.playerId)?.name ?? p.playerId,
+                      side: p.side,
+                      isLock: p.isLock,
+                      isUpset: p.isUpset,
+                    }))
+                  : []
 
                 return (
                   <GameCard
@@ -138,6 +149,8 @@ export default async function ThisWeekPage() {
                     isLock={mine?.isLock ?? false}
                     isUpset={mine?.isUpset ?? false}
                     others={others}
+                    // How many of the others are in, without saying on whom.
+                    othersIn={revealed ? 0 : theirs.length}
                     canPick={Boolean(player)}
                   />
                 )
