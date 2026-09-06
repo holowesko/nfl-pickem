@@ -61,7 +61,7 @@ from triggering the sync job. It is a password: do not commit it.
 1. Go to [github.com/new](https://github.com/new).
 2. Name it `nfl-pickem`. **Do not** tick "Add a README" or add a `.gitignore` —
    this project already has both, and it would create a conflict.
-3. **Public or private?** See the note below. Public is the simpler choice.
+3. Set it to **Public** — see the note below for why.
 4. Create the repository, then push:
 
 ```bash
@@ -72,23 +72,22 @@ git remote add origin https://github.com/YOUR-USERNAME/nfl-pickem.git
 git push -u origin main
 ```
 
-### Public or private?
+### Why public
 
-The schedule runs on GitHub Actions, and that is where this matters:
+The schedule runs on GitHub Actions, and public repositories get unlimited free
+Actions minutes. Private ones get 2,000 a month, and polling every 30 minutes
+costs about 1,440 — it fits, but with little headroom, and going over stops the
+sync silently in the middle of the season.
 
-| | Actions minutes | Our usage |
-|---|---|---|
-| **Public repo** | Unlimited, free | Fine at any frequency |
-| **Private repo** | 2,000 minutes/month free | ~1,440 minutes/month |
+Nothing sensitive is in the code, and the history has been checked. The database
+password and the cron secret live in Vercel and GitHub Secrets, never in the
+repository. `.env.local` and `.pglite/` are both gitignored.
 
-The workflow currently runs every 30 minutes, which is about 1,440 billed
-minutes a month — under the private-repo limit, but without much headroom.
-
-There is nothing sensitive in the code. Your database password and cron secret
-live in Vercel and GitHub Secrets, never in the repository. **Public is
-recommended.** If you would rather keep it private, say so and I will swap in a
-tiered schedule that polls hard around the lock windows and game times and
-barely at all otherwise — that drops it to roughly 500 minutes a month.
+What public does *not* mean: the pool itself is not listed anywhere. The app
+sits at an unlisted URL and is marked `noindex`. Anyone who reads the source
+learns how the scoring works — which is the point of the Rules page anyway —
+but they cannot reach your pool without the link, and they cannot touch the
+database.
 
 ---
 
