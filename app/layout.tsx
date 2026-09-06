@@ -11,7 +11,7 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'HoloPicks Duel',
+  title: 'HoloPicks NFL Duel',
   description: 'Season-long NFL picks against the spread.',
   // This is a private family pool sitting at an unlisted URL; keep it out of
   // search results.
@@ -42,15 +42,13 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         <header className="border-b border-border bg-surface">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-4">
             {/* The name is too wide to share a line with the nav at 375px, so
-                it gets its own row with the toggle. It is allowed to wrap
-                rather than crowd the toggle on a 320px phone, which is the
-                narrowest any of us is likely to hold. */}
+                it gets its own row with the toggle. */}
             <div className="flex items-center justify-between gap-3">
               <Link
                 href="/"
-                className="text-lg font-bold leading-tight tracking-tight text-balance"
+                className="whitespace-nowrap text-lg font-bold tracking-tight"
               >
-                2026-2027 HoloPicks NFL Duel
+                HoloPicks NFL Duel
               </Link>
               <ThemeToggle />
             </div>

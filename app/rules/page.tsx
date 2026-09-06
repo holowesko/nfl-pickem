@@ -1,6 +1,6 @@
 import { POINTS_SPREAD, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
 
-export const metadata = { title: 'Rules · HoloPicks Duel' }
+export const metadata = { title: 'Rules · HoloPicks NFL Duel' }
 
 const scoring = [
   {
