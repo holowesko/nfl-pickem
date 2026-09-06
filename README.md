@@ -1,4 +1,4 @@
-# Holowesko Pick&rsquo;em
+# HoloPicks Duel
 
 A season-long NFL pick&rsquo;em pool for three people, with no accounts and no
 passwords. One link, tap your name, make your picks.
