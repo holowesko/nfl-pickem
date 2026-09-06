@@ -1,0 +1,35 @@
+# Vercel's free tier allows only two cron jobs, once a day each - not enough for
+# a 7am lock, a 10am lock, and score updates. GitHub Actions runs the schedule
+# instead, and it is free.
+#
+# Scheduled runs can be delayed by several minutes under load, which is exactly
+# why the graded line is "the last snapshot at or before the lock time" rather
+# than "whatever we fetched at 10:00". Frequent polling matters; punctuality
+# does not.
+name: Poll lines and scores
+
+on:
+  schedule:
+    # Every 30 minutes. Cron here is UTC.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Snapshot the current lines
+        run: |
+          curl -sS -f -X POST "$APP_URL/api/cron/snapshot-lines" \
+            -H "Authorization: Bearer $CRON_SECRET"
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+      - name: Update scores and rescore the week
+        run: |
+          curl -sS -f -X POST "$APP_URL/api/cron/update-scores" \
+            -H "Authorization: Bearer $CRON_SECRET"
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
