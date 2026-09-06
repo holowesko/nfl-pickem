@@ -6,7 +6,7 @@
 # why the graded line is "the last snapshot at or before the lock time" rather
 # than "whatever we fetched at 10:00". Frequent polling matters; punctuality
 # does not.
-name: Poll lines and scores
+name: Sync schedule, lines and scores
 
 on:
   schedule:
@@ -15,20 +15,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  poll:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Snapshot the current lines
+      - name: Sync from ESPN
         run: |
-          curl -sS -f -X POST "$APP_URL/api/cron/snapshot-lines" \
-            -H "Authorization: Bearer $CRON_SECRET"
-        env:
-          APP_URL: ${{ secrets.APP_URL }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-
-      - name: Update scores and rescore the week
-        run: |
-          curl -sS -f -X POST "$APP_URL/api/cron/update-scores" \
+          curl -sS -f -X POST "$APP_URL/api/cron/sync" \
             -H "Authorization: Bearer $CRON_SECRET"
         env:
           APP_URL: ${{ secrets.APP_URL }}

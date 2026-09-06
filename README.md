@@ -22,13 +22,14 @@ All deadlines are US Eastern, shown to each player in their own time zone.
 
 | Games | Locks at |
 |---|---|
-| Thursday | 10:00am ET Thursday |
-| Saturday | 10:00am ET Saturday |
 | Sunday and Monday | 10:00am ET Sunday |
+| Any other day | 10:00am ET that morning |
 | Anything kicking before 10:00am ET | 7:00am ET that morning |
 
-That last row is what covers the international games. It is written as a
-kickoff-time rule rather than a "London" flag so it also catches any other
+The middle row is written as a general rule rather than a list of weekdays
+because the schedule does not cooperate — the 2026 season opens on a
+*Wednesday*. The last row is what covers the international games, and it keys
+off kickoff time rather than a country flag so it also catches any other
 unusually early start.
 
 The graded spread is the one in place when the game&rsquo;s window locked, not
@@ -39,29 +40,59 @@ on the same number.
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in DATABASE_URL and ODDS_API_KEY
-psql "$DATABASE_URL" -f db/schema.sql
 npm run dev
 ```
 
-## Tests
+That is the whole thing. With no `DATABASE_URL` set, the app runs against an
+embedded [PGlite](https://pglite.dev) database — real Postgres compiled to
+WASM, persisted to `.pglite/` — so there is no account to create and nothing to
+install. The schema is applied automatically on boot.
 
-The scoring and deadline rules are pure functions with no database or network
-dependency, so they can be run directly:
+To load the current week's games and lines, with the dev server running:
+
+```bash
+curl -X POST http://localhost:3002/api/cron/sync -H "Authorization: Bearer dev-secret"
+```
+
+(`CRON_SECRET=dev-secret` lives in `.env.local`.)
+
+## Tests
 
 ```bash
 npm test
 ```
 
+The scoring rules, the deadline rules, and the ESPN parser are pure functions
+with no database or network dependency, so the suite runs in under a second.
+
+There is also an end-to-end check that pulls the live slate, stores it, makes
+picks, freezes a line and scores a game against the embedded database:
+
+```bash
+npx tsx scripts/verify.mts
+```
+
 ## How the data gets in
 
-- **Schedule and scores** come from ESPN&rsquo;s public endpoints. No key needed.
-- **Point spreads** come from [The Odds API](https://the-odds-api.com) free tier.
+Everything — schedule, point spreads, and final scores — comes from ESPN's
+public scoreboard endpoint in a single request. No API key, no rate limit, no
+second source to reconcile.
 
-Vercel&rsquo;s free plan allows only two cron jobs, once per day each, which is
-not enough for a 7am lock, a 10am lock, and score updates. The schedule runs
-from GitHub Actions instead (`.github/workflows/poll.yml`), which is free and
-unmetered for this volume.
+ESPN reports the spread from the home team's perspective, which is the same
+convention used throughout this codebase: `-3.5` means the home team is favored
+by 3.5, `+3.5` means they are getting points.
+
+One scheduled job, `POST /api/cron/sync`, does all of it and is safe to run at
+any time:
+
+1. upsert the week's games
+2. record a line snapshot if the spread moved
+3. freeze the graded line for any window whose deadline has passed
+4. update scores and mark games final
+
+Vercel's free plan allows only two cron jobs, once per day each, which is not
+enough for a 7am lock, a 10am lock, and score updates. The schedule runs from
+GitHub Actions instead (`.github/workflows/poll.yml`), every 30 minutes.
 
 Scheduled runs on GitHub can drift by several minutes. That is why the graded
 line is defined as *the last snapshot at or before the lock time* rather than
@@ -70,14 +101,10 @@ does not.
 
 ### Required secrets
 
-Set these in both Vercel (environment variables) and GitHub (repository
-secrets, for the workflow):
-
 | Name | Where | Purpose |
 |---|---|---|
 | `DATABASE_URL` | Vercel | Neon connection string |
-| `ODDS_API_KEY` | Vercel | Point spreads |
-| `CRON_SECRET` | Vercel + GitHub | Shared bearer token for the cron endpoints |
+| `CRON_SECRET` | Vercel + GitHub | Shared bearer token for the sync endpoint |
 | `APP_URL` | GitHub | Deployed base URL, e.g. `https://picks.vercel.app` |
 
 ## Privacy

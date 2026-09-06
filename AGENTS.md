@@ -22,11 +22,14 @@ with no database or network access. Every rule change belongs there and needs a
 test in the matching `*.test.ts` — run them with `npm test`. Do not scatter
 scoring logic into components or route handlers.
 
-Two rules are easy to get wrong and are pinned by tests:
+Rules that are easy to get wrong and are pinned by tests:
 
 - Monday games lock with the **Sunday** window, not Monday morning.
 - The "early kickoff" rule keys off kickoff time (before 10:00am ET), not off a
   country flag, so it covers London, Berlin, Madrid, and anything else odd.
+- Everything else locks at 10am ET on its own day. Do not hard-code the set of
+  weekdays: the 2026 season opens on a Wednesday, and Friday and holiday games
+  happen too.
 
 ## Time
 
@@ -34,7 +37,36 @@ Every deadline is defined in US Eastern and stored as a UTC instant. Never use
 the server's local time zone — `lib/time.ts` has the conversion helpers, and
 they are DST-correct.
 
+## Spreads
+
+One convention, everywhere: `spreadHome` is from the **home team's**
+perspective. `-3.5` means the home team is favored by 3.5. ESPN uses the same
+convention, so the number passes through `lib/espn.ts` unchanged.
+
+`spreadHome` is the live line and moves all week. `lockedSpreadHome` is the
+frozen snapshot that actually grades the pick. Scoring must always read the
+locked one.
+
+## Data
+
+ESPN's public scoreboard is the only external source, and one request carries
+the schedule, the spreads, and the scores. There is no API key. Do not add a
+second odds provider without a reason — reconciling two sources is how the
+spread convention gets broken.
+
+## Database
+
+Production is Neon Postgres via `DATABASE_URL`. With that unset in development,
+`lib/db.ts` falls back to PGlite (WASM Postgres) persisted in `.pglite/`, so the
+app runs with no setup. Both backends are used through the same tagged-template
+`Sql` type — keep it that way, and keep `db/schema.sql` idempotent, because it
+is re-applied on every local boot.
+
+PGlite must stay in `serverExternalPackages` in `next.config.ts`; bundling it
+breaks its runtime file access.
+
 ## Scheduling
 
 Scheduled work runs from GitHub Actions, not Vercel cron (the free plan caps at
-two jobs per day). Jobs must be idempotent and tolerant of late runs.
+two jobs per day). `POST /api/cron/sync` must stay idempotent and tolerant of
+late runs.

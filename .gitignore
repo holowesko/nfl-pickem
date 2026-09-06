@@ -42,3 +42,9 @@ next-env.d.ts
 
 # ...but the template belongs in the repo.
 !.env.example
+
+# Local PGlite development database
+.pglite/
+
+# Local dev server log
+.dev.log
