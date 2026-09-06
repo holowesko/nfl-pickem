@@ -323,3 +323,51 @@ export async function setCurrentWeek(season: number, week: number): Promise<void
     on conflict (key) do update set value = excluded.value
   `
 }
+
+export type Avatar = { dataBase64: string; mime: string; updatedAt: string }
+
+/** Which players have a photo, and when it last changed (for cache busting). */
+export async function getAvatarVersions(): Promise<Map<string, string>> {
+  const sql = await db()
+  const rows = (await sql`
+    select player_id, updated_at from player_avatars
+  `) as Row[]
+  return new Map(
+    rows.map((r) => [r.player_id, new Date(r.updated_at).getTime().toString(36)])
+  )
+}
+
+export async function getAvatar(playerId: string): Promise<Avatar | null> {
+  const sql = await db()
+  const [row] = (await sql`
+    select data_base64, mime, updated_at from player_avatars
+    where player_id = ${playerId}
+  `) as Row[]
+  if (!row) return null
+  return {
+    dataBase64: row.data_base64,
+    mime: row.mime,
+    updatedAt: new Date(row.updated_at).toISOString(),
+  }
+}
+
+export async function setAvatar(
+  playerId: string,
+  dataBase64: string,
+  mime: string
+): Promise<void> {
+  const sql = await db()
+  await sql`
+    insert into player_avatars (player_id, data_base64, mime)
+    values (${playerId}, ${dataBase64}, ${mime})
+    on conflict (player_id) do update set
+      data_base64 = excluded.data_base64,
+      mime = excluded.mime,
+      updated_at = now()
+  `
+}
+
+export async function clearAvatar(playerId: string): Promise<void> {
+  const sql = await db()
+  await sql`delete from player_avatars where player_id = ${playerId}`
+}

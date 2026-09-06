@@ -131,6 +131,13 @@ does not.
 | `CRON_SECRET` | Vercel + GitHub | Shared bearer token for the sync endpoint |
 | `APP_URL` | GitHub | Deployed base URL, e.g. `https://picks.vercel.app` |
 
+## Profile photos
+
+Each player can set a photo, which replaces their name in the score tiles. The
+image is cropped square and shrunk to 192px in the browser before upload, so a
+stored photo is a couple of kilobytes and lives in Postgres rather than in a
+separate blob service.
+
 ## Who can see what
 
 There is no authentication. The pool lives at an unlisted URL and is marked

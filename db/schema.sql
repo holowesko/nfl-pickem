@@ -79,6 +79,16 @@ create table if not exists weekly_bonuses (
 
 create index if not exists weekly_bonuses_game_idx on weekly_bonuses (game_id);
 
+-- Profile photos, one per player. Base64 text rather than bytea so the same
+-- schema works through both the Neon HTTP driver and PGlite. Images are resized
+-- to 192px square in the browser, so a row is a few kilobytes.
+create table if not exists player_avatars (
+  player_id    text primary key references players (id) on delete cascade,
+  data_base64  text not null,
+  mime         text not null,
+  updated_at   timestamptz not null default now()
+);
+
 -- Small key/value store for things like the current week override.
 create table if not exists app_meta (
   key   text primary key,

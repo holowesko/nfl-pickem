@@ -67,6 +67,18 @@ The Upset list is built from underdogs only, so it is legal by construction —
 but `validateBonus` still checks server-side, because a Server Action is
 reachable by direct POST.
 
+## Profile photos
+
+Stored in `player_avatars` as base64 text, not in a blob service — three photos
+at a couple of kilobytes each do not justify another service and another
+credential. `AvatarUploader` centre-crops and resizes to 192px in the browser
+first, so a multi-megabyte phone photo never reaches the server.
+
+They are served from `/api/avatar/[playerId]`, not inlined as data URIs, so the
+browser caches them instead of re-downloading on every render. Callers append
+`?v=<version>` from `getAvatarVersions()`; that is what makes it safe to send
+`immutable` cache headers.
+
 ## Theming
 
 Three states, not two: no choice yet (follow the device), forced light, forced

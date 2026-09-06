@@ -5,6 +5,7 @@ import {
   getWeekGames,
   getWeekPicks,
   getWeekBonuses,
+  getAvatarVersions,
   type GameRow,
 } from '@/lib/queries'
 import { groupSlate, formatSpread } from '@/lib/slate'
@@ -12,6 +13,7 @@ import { etParts, arePicksClosed, isSpreadLocked } from '@/lib/time'
 import { scoreWeek, underdogSide, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { PlayerPicker } from '@/components/PlayerPicker'
+import { AvatarUploader } from '@/components/AvatarUploader'
 import { GameCard, type OtherPick } from '@/components/GameCard'
 import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
 
@@ -86,10 +88,11 @@ export default async function ThisWeekPage() {
     )
   }
 
-  const [games, picks, bonuses] = await Promise.all([
+  const [games, picks, bonuses, avatars] = await Promise.all([
     getWeekGames(current.season, current.week),
     getWeekPicks(current.season, current.week),
     getWeekBonuses(current.season, current.week),
+    getAvatarVersions(),
   ])
 
   if (games.length === 0) {
@@ -146,6 +149,8 @@ export default async function ThisWeekPage() {
     <div className="space-y-6">
       <PlayerPicker players={PLAYERS} currentId={player?.id} />
 
+      {player ? <AvatarUploader hasPhoto={avatars.has(player.id)} /> : null}
+
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Week {current.week}</h1>
         <p className="text-sm text-muted">{games.length} games</p>
@@ -154,7 +159,25 @@ export default async function ThisWeekPage() {
       <div className="grid grid-cols-3 gap-2">
         {scores.map(({ player: p, score, made, bonusesMade }) => (
           <div key={p.id} className="rounded-xl border border-border bg-surface p-3 text-center">
-            <p className="text-xs text-muted">{p.name}</p>
+            {/* Fixed height either way, so a tile with a photo and a tile
+                without still line up. */}
+            <div className="flex h-10 items-center justify-center">
+              {avatars.has(p.id) ? (
+                // The photo stands in for the name, so it carries the name as
+                // its alt text. The version string busts the browser cache the
+                // moment a new photo is saved.
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={`/api/avatar/${p.id}?v=${avatars.get(p.id)}`}
+                  alt={p.name}
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              ) : (
+                <span className="text-xs text-muted">{p.name}</span>
+              )}
+            </div>
             <p className="mt-0.5 text-xl font-bold tabular-nums">{score.points}</p>
             {/* A notch below text-xs so both counters hold one line on a
                 320px phone, and so they read as secondary to the score. */}
