@@ -107,7 +107,12 @@ database.
 
 5. Click **Deploy** and wait for the build.
 6. Copy your production URL — something like
-   `https://nfl-pickem-abc123.vercel.app`. Save it to your scratch note.
+   `https://YOUR-PROJECT.vercel.app`. Save it to your scratch note.
+
+   > Read it off the Vercel dashboard — never guess it or copy it from an
+   > example. Vercel appends a suffix when the plain name is taken, and
+   > `nfl-pickem.vercel.app` already belongs to somebody else. Sending the sync
+   > job at a stranger's site produces a 404 that looks like a bug in this app.
 
 > If you want a nicer address, go to **Settings → Domains** and rename the
 > project. A less guessable name is slightly better here, since the pool has no
