@@ -5,6 +5,7 @@ import { setPick, clearPick, setLock, setUpset } from '@/app/picks-actions'
 import { displaySpread } from '@/lib/slate'
 import { underdogSide, type Side } from '@/lib/scoring'
 import { LocalTime } from './LocalTime'
+import { TeamLogo } from './TeamLogo'
 
 export type OtherPick = {
   playerId: string
@@ -118,9 +119,9 @@ export function GameCard({
                 interactive ? 'hover:border-accent' : 'cursor-default opacity-90',
               ].join(' ')}
             >
-              <span className="flex min-w-0 items-baseline gap-2">
-                <span className="font-mono text-sm font-bold">{team}</span>
-                <span className="truncate text-sm opacity-80">{name}</span>
+              <span className="flex min-w-0 items-center gap-2.5">
+                <TeamLogo abbreviation={team} />
+                <span className="truncate text-sm font-medium">{name}</span>
               </span>
 
               <span className="flex shrink-0 items-center gap-3">
