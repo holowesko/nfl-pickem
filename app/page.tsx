@@ -111,6 +111,8 @@ export default async function ThisWeekPage() {
       bonuses.filter((bonus) => bonus.playerId === p.id)
     ),
     made: picks.filter((pick) => pick.playerId === p.id).length,
+    // At most two, since the table allows one Lock and one Upset per week.
+    bonusesMade: bonuses.filter((bonus) => bonus.playerId === p.id).length,
   }))
 
   const lockOptions = bonusOptions(games, false)
@@ -150,12 +152,17 @@ export default async function ThisWeekPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        {scores.map(({ player: p, score, made }) => (
+        {scores.map(({ player: p, score, made, bonusesMade }) => (
           <div key={p.id} className="rounded-xl border border-border bg-surface p-3 text-center">
             <p className="text-xs text-muted">{p.name}</p>
             <p className="mt-0.5 text-xl font-bold tabular-nums">{score.points}</p>
-            <p className="text-xs text-muted">
-              {made}/{games.length} in
+            {/* A notch below text-xs so both counters hold one line on a
+                320px phone, and so they read as secondary to the score. */}
+            <p className="text-[0.7rem] tabular-nums text-muted">
+              {made}/{games.length} games
+            </p>
+            <p className="text-[0.7rem] tabular-nums text-muted" title="Lock and Upset">
+              {bonusesMade}/2 L+U
             </p>
           </div>
         ))}
