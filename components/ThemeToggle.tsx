@@ -33,7 +33,9 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Switch between light and dark"
-      className="-mr-1 rounded-lg p-1.5 text-muted transition hover:bg-surface-2 hover:text-foreground"
+      // Inherits the header band's ink rather than the page tokens, so it stays
+      // legible on the turf in either theme.
+      className="-mr-1 rounded-lg p-1.5 text-current opacity-80 transition hover:bg-white/10 hover:opacity-100"
     >
       <svg
         className="icon-sun"

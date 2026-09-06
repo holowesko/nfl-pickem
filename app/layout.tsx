@@ -38,12 +38,29 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <header className="border-b border-border bg-surface">
+        <header className="field-bar border-b border-black/20">
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-4">
             <Link
               href="/"
-              className="whitespace-nowrap text-lg font-bold tracking-tight"
+              className="flex items-center gap-2.5 whitespace-nowrap text-lg font-bold tracking-tight"
             >
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                aria-hidden="true"
+                className="shrink-0 opacity-90"
+              >
+                {/* A pointed lens, not an ellipse — rounded ends read as an
+                    eye at this size, points read as a football. */}
+                <path d="M2.6 12c2.7-3.7 5.8-5.5 9.4-5.5s6.7 1.8 9.4 5.5c-2.7 3.7-5.8 5.5-9.4 5.5S5.3 15.7 2.6 12z" />
+                <path d="M8 12h8" />
+                <path d="M9.6 10.1v3.8M12 9.8v4.4M14.4 10.1v3.8" />
+              </svg>
               HoloPicks NFL Duel
             </Link>
             <ThemeToggle />

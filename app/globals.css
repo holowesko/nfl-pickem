@@ -26,6 +26,11 @@
   --accent-fg: #ffffff;
   --lock: #b4790a;
   --upset: #8a3ffc;
+
+  /* The header band: turf green, its yard lines, and the ink that sits on it. */
+  --field: #14532d;
+  --field-line: rgba(255, 255, 255, 0.07);
+  --field-ink: #f1f7f3;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,6 +46,11 @@
     --accent-fg: #06231a;
     --lock: #f0b429;
     --upset: #b18cf5;
+
+    /* Deeper on a dark page, so the band reads as turf rather than glowing. */
+    --field: #0b3122;
+    --field-line: rgba(255, 255, 255, 0.055);
+    --field-ink: #e9f2ec;
   }
 }
 
@@ -56,6 +66,10 @@
   --accent-fg: #06231a;
   --lock: #f0b429;
   --upset: #b18cf5;
+
+  --field: #0b3122;
+  --field-line: rgba(255, 255, 255, 0.055);
+  --field-ink: #e9f2ec;
 }
 
 @theme inline {
@@ -105,4 +119,23 @@ body {
 }
 :root[data-theme="dark"] .icon-moon {
   display: none;
+}
+
+/*
+ * The header as a stretch of field: turf green, with yard lines every 44px and
+ * a heavier one at midfield intervals. Kept faint — it should read as texture
+ * under the name, not as a picture of a pitch.
+ *
+ * This band keeps its own colours in both themes on purpose. It is the one
+ * branded element, and a football field is green whichever way the phone is set.
+ */
+.field-bar {
+  background-color: var(--field);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      var(--field-line) 0 1px,
+      transparent 1px 58px
+    );
+  color: var(--field-ink);
 }
