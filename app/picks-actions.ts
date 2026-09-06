@@ -3,8 +3,14 @@
 import { refresh } from 'next/cache'
 import { currentPlayer } from '@/lib/players'
 import { arePicksClosed } from '@/lib/time'
-import { isValidUpsetPick, type Side } from '@/lib/scoring'
-import { getGame, getPick, upsertPick, removePick, setWeeklyFlag } from '@/lib/queries'
+import { validateBonus, type BonusKind, type Side } from '@/lib/scoring'
+import {
+  getGame,
+  upsertPick,
+  removePick,
+  setBonus,
+  clearBonus,
+} from '@/lib/queries'
 
 export type ActionResult = { ok: true } | { ok: false; error: string }
 
@@ -23,7 +29,7 @@ async function requireOpenGame(gameId: string) {
   const game = await getGame(gameId)
   if (!game) throw new Error('That game is not on this week’s slate.')
   if (arePicksClosed(new Date(game.kickoff))) {
-    throw new Error(`Picks for ${game.awayTeam} @ ${game.homeTeam} are locked.`)
+    throw new Error(`Picks for ${game.awayTeam} @ ${game.homeTeam} are closed.`)
   }
   return game
 }
@@ -58,14 +64,25 @@ export async function clearPick(gameId: string): Promise<ActionResult> {
 }
 
 /**
- * Setting the Lock or the Upset moves it off whatever game previously held it,
- * so there is never more than one of each in a week.
+ * Choose the Lock or the Upset for a week.
+ *
+ * These are selections in their own right — picking a team here does not imply
+ * a spread pick on that game, and does not require one.
  */
-export async function setLock(gameId: string, value: boolean): Promise<ActionResult> {
+export async function chooseBonus(
+  kind: BonusKind,
+  gameId: string,
+  side: Side
+): Promise<ActionResult> {
   try {
     const player = await requirePlayer()
-    const game = await requireOpenGame(gameId)
-    await setWeeklyFlag(player.id, gameId, game.season, game.week, 'lock', value)
+    const game = await getGame(gameId)
+    if (!game) throw new Error('That game is not on this week’s slate.')
+
+    const problem = validateBonus(game, side, kind)
+    if (problem) throw new Error(problem.message)
+
+    await setBonus(player.id, game.season, game.week, kind, gameId, side)
     refresh()
     return { ok: true }
   } catch (error) {
@@ -73,23 +90,14 @@ export async function setLock(gameId: string, value: boolean): Promise<ActionRes
   }
 }
 
-export async function setUpset(gameId: string, value: boolean): Promise<ActionResult> {
+export async function removeBonus(
+  kind: BonusKind,
+  season: number,
+  week: number
+): Promise<ActionResult> {
   try {
     const player = await requirePlayer()
-    const game = await requireOpenGame(gameId)
-
-    if (value) {
-      const pick = await getPick(player.id, gameId)
-      if (!pick) {
-        throw new Error('Pick the underdog first, then flag it as your Upset.')
-      }
-      if (!isValidUpsetPick(game.spreadHome, pick.side)) {
-        const team = pick.side === 'home' ? game.homeTeam : game.awayTeam
-        throw new Error(`${team} is not an underdog — the Upset must be a plus-spread team.`)
-      }
-    }
-
-    await setWeeklyFlag(player.id, gameId, game.season, game.week, 'upset', value)
+    await clearBonus(player.id, season, week, kind)
     refresh()
     return { ok: true }
   } catch (error) {

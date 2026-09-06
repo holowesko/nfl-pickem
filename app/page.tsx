@@ -1,11 +1,18 @@
 import { isDatabaseConfigured } from '@/lib/db'
 import { currentPlayer, PLAYERS } from '@/lib/players'
-import { getCurrentWeek, getWeekGames, getWeekPicks } from '@/lib/queries'
-import { groupSlate } from '@/lib/slate'
+import {
+  getCurrentWeek,
+  getWeekGames,
+  getWeekPicks,
+  getWeekBonuses,
+  type GameRow,
+} from '@/lib/queries'
+import { groupSlate, formatSpread } from '@/lib/slate'
 import { etParts, arePicksClosed, isSpreadLocked } from '@/lib/time'
-import { scoreWeek } from '@/lib/scoring'
+import { scoreWeek, underdogSide, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { GameCard, type OtherPick } from '@/components/GameCard'
+import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
 
 function kickoffLabel(iso: string): string {
   const p = etParts(new Date(iso))
@@ -19,6 +26,43 @@ function deadlineLabel(iso: string): string {
   const hour12 = p.hour % 12 === 0 ? 12 : p.hour % 12
   const meridiem = p.hour < 12 ? 'am' : 'pm'
   return `${p.weekday} ${hour12}:${String(p.minute).padStart(2, '0')}${meridiem} ET`
+}
+
+/**
+ * Every team still pickable this week, one entry per side.
+ *
+ * `onlyUnderdogs` is what makes the Upset list legal by construction rather
+ * than by rejecting a choice after the fact.
+ */
+function bonusOptions(games: GameRow[], onlyUnderdogs: boolean): BonusOption[] {
+  const options: BonusOption[] = []
+
+  for (const game of games) {
+    if (arePicksClosed(new Date(game.kickoff))) continue
+
+    const dog = underdogSide(game.spreadHome)
+
+    // The Upset needs a line to know who the underdog is. The Lock does not —
+    // it is about winning outright — so a game without a posted line can still
+    // be locked.
+    if (onlyUnderdogs && dog === null) continue
+
+    for (const side of ['away', 'home'] as const) {
+      if (onlyUnderdogs && side !== dog) continue
+
+      const isHome = side === 'home'
+      const line = formatSpread(game.spreadHome, side)
+      options.push({
+        gameId: game.id,
+        side,
+        team: isHome ? game.homeTeam : game.awayTeam,
+        name: isHome ? game.homeName : game.awayName,
+        detail: `${isHome ? 'vs' : '@'} ${isHome ? game.awayTeam : game.homeTeam} · ${line}`,
+      })
+    }
+  }
+
+  return options.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export default async function ThisWeekPage() {
@@ -41,9 +85,10 @@ export default async function ThisWeekPage() {
     )
   }
 
-  const [games, picks] = await Promise.all([
+  const [games, picks, bonuses] = await Promise.all([
     getWeekGames(current.season, current.week),
     getWeekPicks(current.season, current.week),
+    getWeekBonuses(current.season, current.week),
   ])
 
   if (games.length === 0) {
@@ -61,10 +106,38 @@ export default async function ThisWeekPage() {
       p.id,
       current.week,
       games,
-      picks.filter((pick) => pick.playerId === p.id)
+      picks.filter((pick) => pick.playerId === p.id),
+      bonuses.filter((bonus) => bonus.playerId === p.id)
     ),
     made: picks.filter((pick) => pick.playerId === p.id).length,
   }))
+
+  const lockOptions = bonusOptions(games, false)
+  const upsetOptions = bonusOptions(games, true)
+
+  const mine = (kind: 'lock' | 'upset') =>
+    bonuses.find((b) => b.playerId === player?.id && b.kind === kind) ?? null
+
+  const asOption = (kind: 'lock' | 'upset'): BonusOption | null => {
+    const bonus = mine(kind)
+    if (!bonus) return null
+    const list = kind === 'lock' ? lockOptions : upsetOptions
+    const match = list.find((o) => o.gameId === bonus.gameId && o.side === bonus.side)
+    if (match) return match
+
+    // The chosen game has kicked off, so it is no longer in the option list.
+    // Still show what was picked.
+    const game = games.find((g) => g.id === bonus.gameId)
+    if (!game) return null
+    const isHome = bonus.side === 'home'
+    return {
+      gameId: bonus.gameId,
+      side: bonus.side,
+      team: isHome ? game.homeTeam : game.awayTeam,
+      name: isHome ? game.homeName : game.awayName,
+      detail: 'Locked in',
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -91,6 +164,31 @@ export default async function ThisWeekPage() {
         </p>
       ) : null}
 
+      <div className="grid grid-cols-2 gap-2">
+        <BonusPicker
+          kind="lock"
+          label="Lock"
+          points={`+${POINTS_LOCK}`}
+          hint="One a week. Wins outright, spread be damned."
+          options={lockOptions}
+          selected={asOption('lock')}
+          season={current.season}
+          week={current.week}
+          canPick={Boolean(player)}
+        />
+        <BonusPicker
+          kind="upset"
+          label="Upset"
+          points={`+${POINTS_UPSET}`}
+          hint="One a week. Underdogs only, must win outright."
+          options={upsetOptions}
+          selected={asOption('upset')}
+          season={current.season}
+          week={current.week}
+          canPick={Boolean(player)}
+        />
+      </div>
+
       {groups.map((group) => {
         const spreadLocked = isSpreadLocked(new Date(group.games[0].kickoff))
 
@@ -109,7 +207,7 @@ export default async function ThisWeekPage() {
 
             <div className="grid gap-2">
               {group.games.map((game) => {
-                const mine = myPicks.get(game.id)
+                const mySide = myPicks.get(game.id)?.side ?? null
 
                 // Other players' picks stay hidden until this game kicks off.
                 // The filtering happens here, on the server, so the hidden
@@ -126,8 +224,20 @@ export default async function ThisWeekPage() {
                       playerName:
                         PLAYERS.find((x) => x.id === p.playerId)?.name ?? p.playerId,
                       side: p.side,
-                      isLock: p.isLock,
-                      isUpset: p.isUpset,
+                      isLock: bonuses.some(
+                        (b) =>
+                          b.playerId === p.playerId &&
+                          b.kind === 'lock' &&
+                          b.gameId === game.id &&
+                          b.side === p.side
+                      ),
+                      isUpset: bonuses.some(
+                        (b) =>
+                          b.playerId === p.playerId &&
+                          b.kind === 'upset' &&
+                          b.gameId === game.id &&
+                          b.side === p.side
+                      ),
                     }))
                   : []
 
@@ -147,14 +257,11 @@ export default async function ThisWeekPage() {
                       homeScore: game.homeScore,
                       awayScore: game.awayScore,
                       final: game.final,
-                      locked: arePicksClosed(new Date(game.kickoff)),
+                      locked: revealed,
                       spreadLocked: isSpreadLocked(new Date(game.kickoff)),
                     }}
-                    mySide={mine?.side ?? null}
-                    isLock={mine?.isLock ?? false}
-                    isUpset={mine?.isUpset ?? false}
+                    mySide={mySide}
                     others={others}
-                    // How many of the others are in, without saying on whom.
                     othersIn={revealed ? 0 : theirs.length}
                     canPick={Boolean(player)}
                   />

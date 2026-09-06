@@ -1,6 +1,6 @@
 import { db, toNumber, type Row } from './db'
 import { spreadLockTimeFor } from './time'
-import type { Game, Pick, Side } from './scoring'
+import type { Bonus, BonusKind, Game, Pick, Side } from './scoring'
 import type { ImportedGame, Scoreboard } from './espn'
 
 function toGame(row: Row): Game {
@@ -34,8 +34,16 @@ function toPick(row: Row): Pick {
     playerId: row.player_id,
     gameId: row.game_id,
     side: row.side as Side,
-    isLock: row.is_lock === true,
-    isUpset: row.is_upset === true,
+  }
+}
+
+function toBonus(row: Row): Bonus {
+  return {
+    playerId: row.player_id,
+    week: Number(row.week),
+    kind: row.kind as BonusKind,
+    gameId: row.game_id,
+    side: row.side as Side,
   }
 }
 
@@ -225,47 +233,61 @@ export async function removePick(playerId: string, gameId: string) {
   await sql`delete from picks where player_id = ${playerId} and game_id = ${gameId}`
 }
 
+/** Every Lock and Upset set for a week, across all players. */
+export async function getWeekBonuses(season: number, week: number): Promise<Bonus[]> {
+  const sql = await db()
+  const rows = (await sql`
+    select * from weekly_bonuses where season = ${season} and week = ${week}
+  `) as Row[]
+  return rows.map(toBonus)
+}
+
+export async function getSeasonBonuses(season: number): Promise<Bonus[]> {
+  const sql = await db()
+  const rows = (await sql`
+    select * from weekly_bonuses where season = ${season}
+  `) as Row[]
+  return rows.map(toBonus)
+}
+
 /**
- * Move the Lock (or Upset) flag onto one game, clearing it from the rest of the
- * week first. Doing the clear unconditionally means the "one per week" rule
- * holds even if two requests race, and the database trigger is the backstop.
+ * Set (or move) a player's Lock or Upset for a week.
+ *
+ * The primary key covers player, season, week and kind, so an upsert is all
+ * that "only one per week" requires — no clearing of a previous choice, and no
+ * window where two could exist.
  */
-export async function setWeeklyFlag(
+export async function setBonus(
   playerId: string,
-  gameId: string,
   season: number,
   week: number,
-  flag: 'lock' | 'upset',
-  value: boolean
+  kind: BonusKind,
+  gameId: string,
+  side: Side
 ): Promise<void> {
   const sql = await db()
-
-  if (flag === 'lock') {
-    await sql`
-      update picks set is_lock = false, updated_at = now()
-      where player_id = ${playerId} and is_lock
-        and game_id in (select id from games where season = ${season} and week = ${week})
-    `
-    if (value) {
-      await sql`
-        update picks set is_lock = true, updated_at = now()
-        where player_id = ${playerId} and game_id = ${gameId}
-      `
-    }
-    return
-  }
-
   await sql`
-    update picks set is_upset = false, updated_at = now()
-    where player_id = ${playerId} and is_upset
-      and game_id in (select id from games where season = ${season} and week = ${week})
+    insert into weekly_bonuses (player_id, season, week, kind, game_id, side)
+    values (${playerId}, ${season}, ${week}, ${kind}, ${gameId}, ${side})
+    on conflict (player_id, season, week, kind) do update set
+      game_id = excluded.game_id,
+      side = excluded.side,
+      updated_at = now()
   `
-  if (value) {
-    await sql`
-      update picks set is_upset = true, updated_at = now()
-      where player_id = ${playerId} and game_id = ${gameId}
-    `
-  }
+}
+
+export async function clearBonus(
+  playerId: string,
+  season: number,
+  week: number,
+  kind: BonusKind
+): Promise<void> {
+  const sql = await db()
+  await sql`
+    delete from weekly_bonuses
+    where player_id = ${playerId} and season = ${season}
+      and week = ${week} and kind = ${kind}
+  `
 }
 
 export async function getGame(gameId: string): Promise<GameRow | null> {

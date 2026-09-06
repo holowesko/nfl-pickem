@@ -12,7 +12,8 @@ import {
   getWeekGames,
   getWeekPicks,
   upsertPick,
-  setWeeklyFlag,
+  setBonus,
+  getWeekBonuses,
   freezeLockedSpreads,
 } from '../lib/queries'
 import { groupSlate, formatSpread } from '../lib/slate'
@@ -65,15 +66,18 @@ const dogGame = openGames.find(
 )!
 
 await upsertPick('dad', favourite.id, 'home')
-await setWeeklyFlag('dad', favourite.id, board.season, board.week, 'lock', true)
+await setBonus('dad', board.season, board.week, 'lock', favourite.id, 'home')
 await upsertPick('dad', dogGame.id, 'away')
-await setWeeklyFlag('dad', dogGame.id, board.season, board.week, 'upset', true)
+await setBonus('dad', board.season, board.week, 'upset', dogGame.id, 'away')
 
 let picks = await getWeekPicks(board.season, board.week)
+let dadBonuses = (await getWeekBonuses(board.season, board.week)).filter(
+  (b) => b.playerId === 'dad'
+)
 const dadPicks = picks.filter((p) => p.playerId === 'dad')
 ok('two picks stored', dadPicks.length === 2)
-ok('lock set', dadPicks.filter((p) => p.isLock).length === 1)
-ok('upset set', dadPicks.filter((p) => p.isUpset).length === 1)
+ok('lock set', dadBonuses.filter((b) => b.kind === 'lock').length === 1)
+ok('upset set', dadBonuses.filter((b) => b.kind === 'upset').length === 1)
 console.log(
   `   Lock:  ${favourite.awayTeam} @ ${favourite.homeTeam} (home ${formatSpread(favourite.spreadHome, 'home')})`
 )
@@ -81,24 +85,30 @@ console.log(
   `   Upset: ${dogGame.awayTeam} @ ${dogGame.homeTeam} (away ${formatSpread(dogGame.spreadHome, 'away')})`
 )
 
-console.log('\n5. Moving the Lock to another game clears the old one')
+console.log('\n5. Moving the Lock to another game replaces the old one')
 const other = openGames.find((g) => g.id !== favourite.id && g.id !== dogGame.id)!
 await upsertPick('dad', other.id, 'home')
-await setWeeklyFlag('dad', other.id, board.season, board.week, 'lock', true)
+await setBonus('dad', board.season, board.week, 'lock', other.id, 'home')
 picks = await getWeekPicks(board.season, board.week)
-const locks = picks.filter((p) => p.playerId === 'dad' && p.isLock)
+dadBonuses = (await getWeekBonuses(board.season, board.week)).filter(
+  (b) => b.playerId === 'dad'
+)
+const locks = dadBonuses.filter((b) => b.kind === 'lock')
 ok('exactly one lock remains', locks.length === 1, `on game ${locks[0]?.gameId}`)
 ok('the lock moved to the new game', locks[0]?.gameId === other.id)
 
-console.log('\n6. The database trigger rejects a second lock')
+console.log('\n6. The primary key allows only one Lock per week')
 const sql = await db()
 let rejected = false
 try {
-  await sql`update picks set is_lock = true where player_id = 'dad' and game_id = ${favourite.id}`
+  await sql`
+    insert into weekly_bonuses (player_id, season, week, kind, game_id, side)
+    values ('dad', ${board.season}, ${board.week}, 'lock', ${favourite.id}, 'home')
+  `
 } catch {
   rejected = true
 }
-ok('a hand-written second lock is refused', rejected)
+ok('a second lock row for the week is refused', rejected)
 
 console.log('\n7. Freezing the graded line after a deadline passes')
 // Pretend it is one minute after this game's lock window closed.
@@ -115,8 +125,14 @@ console.log('\n8. Scoring a finished game')
 await sql`update games set home_score = 110, away_score = 10, final = true where id = ${other.id}`
 await sql`update games set locked_spread_home = spread_home where id = ${other.id}`
 const scored = await getWeekGames(board.season, board.week)
-const week = scoreWeek('dad', board.week, scored, (await getWeekPicks(board.season, board.week)).filter((p) => p.playerId === 'dad'))
-ok('lock that covers and wins outright is worth 3', week.points === 3, `${week.points} points`)
+const finalPicks = (await getWeekPicks(board.season, board.week)).filter(
+  (p) => p.playerId === 'dad'
+)
+const finalBonuses = (await getWeekBonuses(board.season, board.week)).filter(
+  (b) => b.playerId === 'dad'
+)
+const week = scoreWeek('dad', board.week, scored, finalPicks, finalBonuses)
+ok('a Lock whose team also covers is worth 3 (1 spread + 2 lock)', week.points === 3, `${week.points} points`)
 ok('one correct pick', week.correct === 1)
 
 console.log('\nDone.\n')

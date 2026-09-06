@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { setPick, clearPick, setLock, setUpset } from '@/app/picks-actions'
+import { setPick, clearPick } from '@/app/picks-actions'
 import { displaySpread } from '@/lib/slate'
 import { underdogSide, type Side } from '@/lib/scoring'
 import { LocalTime } from './LocalTime'
@@ -37,16 +37,12 @@ export type GameCardData = {
 export function GameCard({
   game,
   mySide,
-  isLock,
-  isUpset,
   others,
   othersIn,
   canPick,
 }: {
   game: GameCardData
   mySide: Side | null
-  isLock: boolean
-  isUpset: boolean
   others: OtherPick[]
   /** Count of other players who have picked but are still hidden. */
   othersIn: number
@@ -150,38 +146,6 @@ export function GameCard({
         <p className="mt-2 text-xs text-muted">No line posted yet — check back later.</p>
       ) : null}
 
-      {interactive && mySide ? (
-        <div className="mt-2 flex gap-2">
-          <BonusToggle
-            label="Lock"
-            title="Wins outright, spread be damned (+2)"
-            active={isLock}
-            disabled={pending}
-            tone="lock"
-            onClick={() => run(() => setLock(game.id, !isLock))}
-          />
-          <BonusToggle
-            label="Upset"
-            title={
-              dog === mySide
-                ? 'Your underdog wins outright (+3)'
-                : 'Only an underdog can be your Upset'
-            }
-            active={isUpset}
-            disabled={pending || dog !== mySide}
-            tone="upset"
-            onClick={() => run(() => setUpset(game.id, !isUpset))}
-          />
-        </div>
-      ) : null}
-
-      {(isLock || isUpset) && !interactive ? (
-        <div className="mt-2 flex gap-2">
-          {isLock ? <Badge tone="lock">Lock</Badge> : null}
-          {isUpset ? <Badge tone="upset">Upset</Badge> : null}
-        </div>
-      ) : null}
-
       {others.length > 0 ? (
         <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border pt-2">
           {others.map((other) => (
@@ -208,56 +172,5 @@ export function GameCard({
 
       {error ? <p className="mt-2 text-xs text-red-500">{error}</p> : null}
     </div>
-  )
-}
-
-function BonusToggle({
-  label,
-  title,
-  active,
-  disabled,
-  tone,
-  onClick,
-}: {
-  label: string
-  title: string
-  active: boolean
-  disabled: boolean
-  tone: 'lock' | 'upset'
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      disabled={disabled}
-      aria-pressed={active}
-      onClick={onClick}
-      className={[
-        'rounded-md border px-2.5 py-1 text-xs font-semibold transition disabled:opacity-40',
-        active
-          ? tone === 'lock'
-            ? 'border-lock bg-lock/15 text-lock'
-            : 'border-upset bg-upset/15 text-upset'
-          : 'border-border bg-surface-2 text-muted',
-      ].join(' ')}
-    >
-      {label}
-    </button>
-  )
-}
-
-function Badge({ tone, children }: { tone: 'lock' | 'upset'; children: React.ReactNode }) {
-  return (
-    <span
-      className={[
-        'rounded-md border px-2 py-0.5 text-xs font-semibold',
-        tone === 'lock'
-          ? 'border-lock bg-lock/15 text-lock'
-          : 'border-upset bg-upset/15 text-upset',
-      ].join(' ')}
-    >
-      {children}
-    </span>
   )
 }

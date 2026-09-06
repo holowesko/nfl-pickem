@@ -4,10 +4,16 @@
  *
  * Scoring summary:
  *   - 1 point for picking a game correctly against the spread
- *   - +2 more if that game was your Lock of the Week and the team won outright
- *   - +3 more if that game was your Upset of the Week and the underdog won
+ *   - +2 for the Lock of the Week if that team wins outright
+ *   - +3 for the Upset of the Week if that underdog wins outright
  *   - a push (result lands exactly on the number) is 0 for everyone
  *   - an unpicked game is 0 — there is no auto-pick
+ *
+ * The Lock and the Upset are chosen for the week as a whole, not attached to a
+ * spread pick. Picking a team as your Lock says nothing about whether you also
+ * took them against the number; if you did both and both land, you collect
+ * both, which is where the maximum of 3 on a Lock game (and 4 on an Upset)
+ * still comes from.
  */
 
 import { arePicksClosed } from './time'
@@ -25,8 +31,8 @@ export type Game = {
    * favored by 3. Null until the line is first fetched.
    *
    * `spreadHome` is the live line and moves during the week. `lockedSpreadHome`
-   * is the snapshot taken when the game's lock window closed, and it is the
-   * number that actually grades the pick.
+   * is the snapshot taken when the game's window closed, and it is the number
+   * that actually grades the pick.
    */
   spreadHome: number | null
   lockedSpreadHome: number | null
@@ -35,17 +41,27 @@ export type Game = {
   final: boolean
 }
 
+/** A pick against the spread on one game. */
 export type Pick = {
   playerId: string
   gameId: string
   side: Side
-  isLock: boolean
-  isUpset: boolean
+}
+
+export type BonusKind = 'lock' | 'upset'
+
+/** One of the two weekly bonus selections: a team, in a game, for a week. */
+export type Bonus = {
+  playerId: string
+  week: number
+  kind: BonusKind
+  gameId: string
+  side: Side
 }
 
 export const POINTS_SPREAD = 1
-export const POINTS_LOCK_BONUS = 2
-export const POINTS_UPSET_BONUS = 3
+export const POINTS_LOCK = 2
+export const POINTS_UPSET = 3
 
 /** Which side the underdog is on, or null for a pick'em. */
 export function underdogSide(spreadHome: number | null): Side | null {
@@ -53,7 +69,7 @@ export function underdogSide(spreadHome: number | null): Side | null {
   return spreadHome > 0 ? 'home' : 'away'
 }
 
-/** Whether a side may be flagged as the Upset of the Week on this line. */
+/** Whether a side may be taken as the Upset of the Week on this line. */
 export function isValidUpsetPick(spreadHome: number | null, side: Side): boolean {
   return underdogSide(spreadHome) === side
 }
@@ -78,57 +94,36 @@ export function spreadWinner(game: Game): Side | 'push' | null {
 }
 
 export type PickScore = {
-  spreadPoints: number
-  lockPoints: number
-  upsetPoints: number
-  total: number
-  /** Null while the game is unfinished. */
+  points: number
+  /** Null while the game is unfinished, or on a push. */
   correct: boolean | null
   push: boolean
 }
 
-const ZERO: PickScore = {
-  spreadPoints: 0,
-  lockPoints: 0,
-  upsetPoints: 0,
-  total: 0,
-  correct: null,
-  push: false,
+/** Points earned by a single pick against the spread. */
+export function scorePick(pick: Pick, game: Game): PickScore {
+  const ats = spreadWinner(game)
+  if (ats === null) return { points: 0, correct: null, push: false }
+
+  if (ats === 'push') return { points: 0, correct: null, push: true }
+
+  const covered = ats === pick.side
+  return { points: covered ? POINTS_SPREAD : 0, correct: covered, push: false }
 }
 
-/** Points earned by a single pick on a single game. */
-export function scorePick(pick: Pick, game: Game): PickScore {
-  if (!game.final) return { ...ZERO }
+/**
+ * Points earned by a weekly bonus selection.
+ *
+ * The Upset bonus additionally requires the team to have been an underdog on
+ * the graded line. If the line flipped after the pick was made and the team
+ * ended up favored, the bonus lapses — winning as a favorite is not an upset.
+ */
+export function scoreBonus(bonus: Bonus, game: Game): number {
+  if (outrightWinner(game) !== bonus.side) return 0
 
-  const ats = spreadWinner(game)
-  const outright = outrightWinner(game)
+  if (bonus.kind === 'lock') return POINTS_LOCK
 
-  if (ats === null) return { ...ZERO }
-
-  const push = ats === 'push'
-  const coveredSpread = ats === pick.side
-  const wonOutright = outright === pick.side
-
-  const spreadPoints = coveredSpread ? POINTS_SPREAD : 0
-
-  const lockPoints = pick.isLock && wonOutright ? POINTS_LOCK_BONUS : 0
-
-  // The Upset bonus requires the picked team to have actually been the underdog
-  // on the graded line. If the line flipped after the pick was made and your
-  // team ended up favored, the bonus lapses — the 1-point spread pick stands.
-  const upsetPoints =
-    pick.isUpset && wonOutright && isValidUpsetPick(game.lockedSpreadHome, pick.side)
-      ? POINTS_UPSET_BONUS
-      : 0
-
-  return {
-    spreadPoints,
-    lockPoints,
-    upsetPoints,
-    total: spreadPoints + lockPoints + upsetPoints,
-    correct: push ? null : coveredSpread,
-    push,
-  }
+  return isValidUpsetPick(game.lockedSpreadHome, bonus.side) ? POINTS_UPSET : 0
 }
 
 export type WeekScore = {
@@ -140,16 +135,21 @@ export type WeekScore = {
   pushes: number
   /** Games that were final but never picked. */
   missed: number
+  lockPoints: number
+  upsetPoints: number
 }
 
-/** Roll a player's picks up into a single week's line on the leaderboard. */
+/** Roll a player's week up into a single line on the leaderboard. */
 export function scoreWeek(
   playerId: string,
   week: number,
   games: Game[],
-  picks: Pick[]
+  picks: Pick[],
+  bonuses: Bonus[] = []
 ): WeekScore {
   const byGame = new Map(picks.map((p) => [p.gameId, p]))
+  const gamesById = new Map(games.map((g) => [g.id, g]))
+
   const result: WeekScore = {
     playerId,
     week,
@@ -158,6 +158,8 @@ export function scoreWeek(
     incorrect: 0,
     pushes: 0,
     missed: 0,
+    lockPoints: 0,
+    upsetPoints: 0,
   }
 
   for (const game of games) {
@@ -168,24 +170,30 @@ export function scoreWeek(
       continue
     }
     const score = scorePick(pick, game)
-    result.points += score.total
+    result.points += score.points
     if (score.push) result.pushes += 1
     else if (score.correct) result.correct += 1
     else result.incorrect += 1
+  }
+
+  for (const bonus of bonuses) {
+    const game = gamesById.get(bonus.gameId)
+    if (!game || !game.final) continue
+    const points = scoreBonus(bonus, game)
+    result.points += points
+    if (bonus.kind === 'lock') result.lockPoints += points
+    else result.upsetPoints += points
   }
 
   return result
 }
 
 export type PickValidationError = {
-  code: 'GAME_LOCKED' | 'UPSET_NOT_UNDERDOG' | 'DUPLICATE_LOCK' | 'DUPLICATE_UPSET'
+  code: 'GAME_LOCKED' | 'UPSET_NOT_UNDERDOG' | 'NO_LINE'
   message: string
 }
 
-/**
- * Check a proposed set of picks for one player for one week. Returns every
- * problem found rather than stopping at the first, so the UI can show them all.
- */
+/** Check a proposed spread pick. Returns every problem found, not just the first. */
 export function validateWeekPicks(
   games: Game[],
   picks: Pick[],
@@ -194,22 +202,6 @@ export function validateWeekPicks(
   const errors: PickValidationError[] = []
   const gamesById = new Map(games.map((g) => [g.id, g]))
 
-  const locks = picks.filter((p) => p.isLock)
-  const upsets = picks.filter((p) => p.isUpset)
-
-  if (locks.length > 1) {
-    errors.push({
-      code: 'DUPLICATE_LOCK',
-      message: 'Only one Lock of the Week is allowed.',
-    })
-  }
-  if (upsets.length > 1) {
-    errors.push({
-      code: 'DUPLICATE_UPSET',
-      message: 'Only one Upset of the Week is allowed.',
-    })
-  }
-
   for (const pick of picks) {
     const game = gamesById.get(pick.gameId)
     if (!game) continue
@@ -217,19 +209,40 @@ export function validateWeekPicks(
     if (arePicksClosed(new Date(game.kickoff), now)) {
       errors.push({
         code: 'GAME_LOCKED',
-        message: `Picks for ${game.awayTeam} @ ${game.homeTeam} are already locked.`,
-      })
-    }
-
-    if (pick.isUpset && !isValidUpsetPick(game.spreadHome, pick.side)) {
-      errors.push({
-        code: 'UPSET_NOT_UNDERDOG',
-        message: `Your Upset of the Week must be an underdog, and ${
-          pick.side === 'home' ? game.homeTeam : game.awayTeam
-        } is not.`,
+        message: `Picks for ${game.awayTeam} @ ${game.homeTeam} are closed.`,
       })
     }
   }
 
   return errors
+}
+
+/** Check a proposed Lock or Upset selection. */
+export function validateBonus(
+  game: Game,
+  side: Side,
+  kind: BonusKind,
+  now: Date = new Date()
+): PickValidationError | null {
+  if (arePicksClosed(new Date(game.kickoff), now)) {
+    return {
+      code: 'GAME_LOCKED',
+      message: `${game.awayTeam} @ ${game.homeTeam} has already kicked off.`,
+    }
+  }
+
+  if (kind === 'upset') {
+    if (game.spreadHome === null) {
+      return { code: 'NO_LINE', message: 'That game has no line yet.' }
+    }
+    if (!isValidUpsetPick(game.spreadHome, side)) {
+      const team = side === 'home' ? game.homeTeam : game.awayTeam
+      return {
+        code: 'UPSET_NOT_UNDERDOG',
+        message: `${team} is not an underdog this week.`,
+      }
+    }
+  }
+
+  return null
 }

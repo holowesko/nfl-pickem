@@ -11,10 +11,14 @@ passwords. One link, tap your name, make your picks.
 | **Lock of the Week** — your team wins outright | +2 |
 | **Upset of the Week** — your underdog wins outright | +3 |
 
-Bonuses stack on the spread point, so a Lock that also covers is worth 3 and an
-upset that lands is worth 4. A push scores 0 for everyone. Unpicked games score
-0 — nothing is auto-picked. One Lock and one Upset per week, both optional.
-Most points across the 18-week regular season wins.
+The Lock and the Upset are chosen once for the week from a dropdown, not
+attached to a spread pick — you can Lock a team without taking that game against
+the number. Do both and they stack, so a Lock that also covers is worth 3 and an
+upset that lands is worth 4.
+
+A push scores 0 for everyone. Unpicked games score 0 — nothing is auto-picked.
+One Lock and one Upset per week, both optional. Most points across the 18-week
+regular season wins.
 
 ### Two deadlines, deliberately different
 

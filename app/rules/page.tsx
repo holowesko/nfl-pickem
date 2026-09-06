@@ -1,4 +1,4 @@
-import { POINTS_SPREAD, POINTS_LOCK_BONUS, POINTS_UPSET_BONUS } from '@/lib/scoring'
+import { POINTS_SPREAD, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
 
 export const metadata = { title: 'Rules · HoloPicks Duel' }
 
@@ -10,15 +10,15 @@ const scoring = [
   },
   {
     name: 'Lock of the Week',
-    points: `+${POINTS_LOCK_BONUS} pts`,
+    points: `+${POINTS_LOCK} pts`,
     detail:
-      'One team you think wins outright, spread be damned. Stacks on top of the spread point, so a Lock that also covers is worth 3.',
+      'One team, chosen for the week from anyone playing. It is its own pick — you do not have to take that game against the spread. If you do, and they cover as well, that game is worth 3.',
   },
   {
     name: 'Upset of the Week',
-    points: `+${POINTS_UPSET_BONUS} pts`,
+    points: `+${POINTS_UPSET} pts`,
     detail:
-      'One underdog you think wins outright. Also stacks, so an upset that lands is worth 4. The team must be an underdog on the graded line.',
+      'One underdog, chosen for the week. The dropdown only offers teams getting points, so it cannot be set on a favorite. Take that same dog against the spread too and a landing upset is worth 4.',
   },
 ]
 
@@ -94,7 +94,10 @@ export default function RulesPage() {
         <ul className="list-disc space-y-2 pl-5 text-sm text-muted">
           <li>A push — the result landing exactly on the number — scores 0 for everyone.</li>
           <li>Miss a kickoff and that game simply scores 0. Nothing is auto-picked.</li>
-          <li>The Lock and the Upset are optional, and may both sit on the same game.</li>
+          <li>
+            The Lock and the Upset are optional, are chosen once for the whole week,
+            and may both sit on the same game.
+          </li>
           <li>
             Each game&rsquo;s picks are hidden until that game kicks off. You can see who
             is in, never what they took. Then everything opens up.

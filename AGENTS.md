@@ -53,6 +53,20 @@ Other rules that are easy to get wrong and are pinned by tests:
 - The UI must show the **frozen** line once the window has closed, since players
   keep picking after that point.
 
+## The Lock and the Upset
+
+They are weekly selections in their own right, in `weekly_bonuses`, not flags on
+a pick. A player may Lock a team without having taken that game against the
+spread, and scoring reflects that: `scorePick` returns the spread point only,
+and `scoreBonus` handles the rest. Do not fold them back into `picks`.
+
+One of each per week is enforced by the table's primary key
+(player, season, week, kind), so writing a bonus is a plain upsert.
+
+The Upset list is built from underdogs only, so it is legal by construction —
+but `validateBonus` still checks server-side, because a Server Action is
+reachable by direct POST.
+
 ## Theming
 
 Three states, not two: no choice yet (follow the device), forced light, forced

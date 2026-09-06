@@ -54,8 +54,6 @@ create table if not exists picks (
   player_id     text not null references players (id) on delete cascade,
   game_id       text not null references games (id) on delete cascade,
   side          text not null check (side in ('home', 'away')),
-  is_lock       boolean not null default false,
-  is_upset      boolean not null default false,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now(),
   primary key (player_id, game_id)
@@ -63,47 +61,23 @@ create table if not exists picks (
 
 create index if not exists picks_game_idx on picks (game_id);
 
--- At most one Lock and one Upset per player per week. Enforced in the database
--- as well as in the app, because the app is the only thing standing between
--- three competitive people and a rules argument in February.
-create or replace function assert_one_lock_and_upset() returns trigger as $$
-declare
-  wk int;
-  lock_count int;
-  upset_count int;
-begin
-  select week into wk from games where id = new.game_id;
+-- The Lock and the Upset are weekly selections in their own right, not flags on
+-- a spread pick: a player may Lock a team without having taken that game
+-- against the number. The primary key is what enforces one of each per week,
+-- which the old trigger on picks used to do.
+create table if not exists weekly_bonuses (
+  player_id     text not null references players (id) on delete cascade,
+  season        int  not null,
+  week          int  not null,
+  kind          text not null check (kind in ('lock', 'upset')),
+  game_id       text not null references games (id) on delete cascade,
+  side          text not null check (side in ('home', 'away')),
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  primary key (player_id, season, week, kind)
+);
 
-  select count(*) into lock_count
-  from picks p join games g on g.id = p.game_id
-  where p.player_id = new.player_id
-    and g.week = wk
-    and p.is_lock
-    and p.game_id <> new.game_id;
-
-  select count(*) into upset_count
-  from picks p join games g on g.id = p.game_id
-  where p.player_id = new.player_id
-    and g.week = wk
-    and p.is_upset
-    and p.game_id <> new.game_id;
-
-  if new.is_lock and lock_count > 0 then
-    raise exception 'Only one Lock of the Week is allowed (week %)', wk;
-  end if;
-
-  if new.is_upset and upset_count > 0 then
-    raise exception 'Only one Upset of the Week is allowed (week %)', wk;
-  end if;
-
-  return new;
-end;
-$$ language plpgsql;
-
-drop trigger if exists picks_one_lock_and_upset on picks;
-create trigger picks_one_lock_and_upset
-  before insert or update on picks
-  for each row execute function assert_one_lock_and_upset();
+create index if not exists weekly_bonuses_game_idx on weekly_bonuses (game_id);
 
 -- Small key/value store for things like the current week override.
 create table if not exists app_meta (
