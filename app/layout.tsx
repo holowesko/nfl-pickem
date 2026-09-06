@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Link from 'next/link'
 import './globals.css'
-import { PLAYERS, currentPlayer } from '@/lib/players'
-import { PlayerPicker } from '@/components/PlayerPicker'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { BottomNav } from '@/components/BottomNav'
 import { currentTheme } from '@/lib/theme'
@@ -27,7 +25,7 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
-  const [player, theme] = await Promise.all([currentPlayer(), currentTheme()])
+  const theme = await currentTheme()
 
   return (
     <html
@@ -41,20 +39,14 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
     >
       <body className="min-h-full flex flex-col font-sans">
         <header className="border-b border-border bg-surface">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-4">
-            {/* The name is too wide to share a line with the nav at 375px, so
-                it gets its own row with the toggle. */}
-            <div className="flex items-center justify-between gap-3">
-              <Link
-                href="/"
-                className="whitespace-nowrap text-lg font-bold tracking-tight"
-              >
-                HoloPicks NFL Duel
-              </Link>
-              <ThemeToggle />
-            </div>
-
-            <PlayerPicker players={PLAYERS} currentId={player?.id} />
+          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-4">
+            <Link
+              href="/"
+              className="whitespace-nowrap text-lg font-bold tracking-tight"
+            >
+              HoloPicks NFL Duel
+            </Link>
+            <ThemeToggle />
           </div>
         </header>
 

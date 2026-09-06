@@ -55,6 +55,8 @@ export function PlayerPicker({
 
   return (
     <>
+      <p className="mb-2 text-sm text-muted">Who&rsquo;s picking?</p>
+
       <div className="flex gap-2" role="group" aria-label="Who are you?">
         {players.map((player) => (
           <button

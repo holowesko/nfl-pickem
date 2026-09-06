@@ -11,6 +11,7 @@ import { groupSlate, formatSpread } from '@/lib/slate'
 import { etParts, arePicksClosed, isSpreadLocked } from '@/lib/time'
 import { scoreWeek, underdogSide, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
 import { SetupChecklist } from '@/components/SetupChecklist'
+import { PlayerPicker } from '@/components/PlayerPicker'
 import { GameCard, type OtherPick } from '@/components/GameCard'
 import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
 
@@ -141,6 +142,8 @@ export default async function ThisWeekPage() {
 
   return (
     <div className="space-y-6">
+      <PlayerPicker players={PLAYERS} currentId={player?.id} />
+
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Week {current.week}</h1>
         <p className="text-sm text-muted">{games.length} games</p>
@@ -157,12 +160,6 @@ export default async function ThisWeekPage() {
           </div>
         ))}
       </div>
-
-      {!player ? (
-        <p className="rounded-xl border border-border bg-surface p-4 text-sm">
-          Tap your name above to start picking.
-        </p>
-      ) : null}
 
       <div className="grid grid-cols-2 gap-2">
         <BonusPicker
