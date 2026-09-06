@@ -68,3 +68,27 @@ export function formatSpread(spreadHome: number | null, side: 'home' | 'away'): 
   if (value === 0) return 'PK'
   return value > 0 ? `+${value}` : `${value}`
 }
+
+/**
+ * What to print on one team's row.
+ *
+ * Only the favorite carries the number. Stating it on both rows says the same
+ * thing twice — everyone knows the other side is the same number with the sign
+ * flipped — and the duplication makes the card harder to scan, not easier.
+ *
+ * Null means "print nothing on this row": either the underdog, or a game with
+ * no line yet, which the card calls out separately.
+ */
+export function displaySpread(
+  spreadHome: number | null,
+  side: 'home' | 'away'
+): string | null {
+  if (spreadHome === null) return null
+
+  // A pick-em has no favorite, so it is the one case where both rows are the
+  // same and both should say so.
+  if (spreadHome === 0) return 'PK'
+
+  const favorite = spreadHome < 0 ? 'home' : 'away'
+  return side === favorite ? formatSpread(spreadHome, side) : null
+}

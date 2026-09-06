@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { setPick, clearPick, setLock, setUpset } from '@/app/picks-actions'
-import { formatSpread } from '@/lib/slate'
+import { displaySpread } from '@/lib/slate'
 import { underdogSide, type Side } from '@/lib/scoring'
 import { LocalTime } from './LocalTime'
 
@@ -125,10 +125,9 @@ export function GameCard({
 
               <span className="flex shrink-0 items-center gap-3">
                 <span className="font-mono text-sm tabular-nums">
-                  {formatSpread(spread, side)}
-                  {isDog && !selected ? (
-                    <span className="ml-1 text-xs text-muted">dog</span>
-                  ) : null}
+                  {/* Only the favorite shows the number; the dog is implied. */}
+                  {displaySpread(spread, side) ??
+                    (isDog ? <span className="text-xs text-muted">dog</span> : null)}
                 </span>
                 {game.final && score !== null ? (
                   <span className="w-6 text-right font-mono text-sm font-bold">{score}</span>
