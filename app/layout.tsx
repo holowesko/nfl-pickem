@@ -4,6 +4,8 @@ import Link from 'next/link'
 import './globals.css'
 import { PLAYERS, currentPlayer } from '@/lib/players'
 import { PlayerPicker } from '@/components/PlayerPicker'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { currentTheme } from '@/lib/theme'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
@@ -24,23 +26,32 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
-  const player = await currentPlayer()
+  const [player, theme] = await Promise.all([currentPlayer(), currentTheme()])
 
   return (
     <html
       lang="en"
+      // Rendered on the server from the cookie, so a player who has chosen a
+      // theme never sees the other one flash first. Absent means "follow the
+      // device", which the CSS resolves on its own.
+      data-theme={theme ?? undefined}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <header className="border-b border-border bg-surface">
           <div className="mx-auto w-full max-w-3xl px-4 py-4">
-            <div className="flex items-baseline justify-between gap-4">
-              <Link href="/" className="text-lg font-bold tracking-tight">
+            {/* Everything on one line at 375px, so nothing may wrap. */}
+            <div className="flex items-center justify-between gap-3">
+              <Link
+                href="/"
+                className="whitespace-nowrap text-lg font-bold tracking-tight"
+              >
                 Pick&rsquo;em
               </Link>
-              <nav className="flex gap-4 text-sm font-medium text-muted">
+              <nav className="flex items-center gap-3.5 whitespace-nowrap text-sm font-medium text-muted">
                 <Link href="/" className="hover:text-foreground">
-                  This Week
+                  Picks
                 </Link>
                 <Link href="/leaderboard" className="hover:text-foreground">
                   Leaderboard
@@ -48,6 +59,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
                 <Link href="/rules" className="hover:text-foreground">
                   Rules
                 </Link>
+                <ThemeToggle />
               </nav>
             </div>
 

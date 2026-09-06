@@ -53,6 +53,24 @@ Other rules that are easy to get wrong and are pinned by tests:
 - The UI must show the **frozen** line once the window has closed, since players
   keep picking after that point.
 
+## Theming
+
+Three states, not two: no choice yet (follow the device), forced light, forced
+dark. `app/globals.css` encodes that as bare `:root` for light, a
+`prefers-color-scheme` block guarded with `:root:not([data-theme="light"])`, and
+a `:root[data-theme="dark"]` block last. Breaking that order means a player who
+picks light gets dark back on a dark phone.
+
+Every colour must be defined in the bare `:root` block. A token that only exists
+inside the media query or an attribute block is undefined in the other states.
+
+Keep the `color-scheme` declarations alongside the tokens. Without them the
+browser applies its own dark adjustments over our palette, and forced light on a
+dark device renders wrong even though the computed values are correct.
+
+The theme is stored in a cookie and applied server-side in `app/layout.tsx`, so
+there is no flash of the wrong theme. Do not move it to localStorage.
+
 ## Time
 
 Every deadline is defined in US Eastern and stored as a UTC instant. Never use

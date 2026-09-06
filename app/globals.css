@@ -1,6 +1,21 @@
 @import "tailwindcss";
 
+/*
+ * Three theme states, not two: no choice yet (follow the device), forced light,
+ * and forced dark. The order below matters — the media query is guarded so that
+ * a player who picks light keeps light on a dark phone, and the explicit dark
+ * rule comes last so the toggle wins in the other direction too.
+ */
+
+/*
+ * `color-scheme` tells the browser which way the page leans, so scrollbars,
+ * form controls and its own dark-mode adjustments match the palette we painted.
+ * Without it, a player forcing light on a dark phone gets our light colours
+ * rendered under the browser's dark chrome.
+ */
+
 :root {
+  color-scheme: light;
   --background: #f6f7f9;
   --surface: #ffffff;
   --surface-2: #eef0f4;
@@ -14,7 +29,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --background: #0b0d12;
     --surface: #141821;
     --surface-2: #1c212c;
@@ -26,6 +42,20 @@
     --lock: #f0b429;
     --upset: #b18cf5;
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0b0d12;
+  --surface: #141821;
+  --surface-2: #1c212c;
+  --foreground: #e8eaf0;
+  --muted: #9aa3b5;
+  --border: #262c3a;
+  --accent: #3ddc97;
+  --accent-fg: #06231a;
+  --lock: #f0b429;
+  --upset: #b18cf5;
 }
 
 @theme inline {
@@ -46,4 +76,33 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/*
+ * The toggle shows the theme you would switch *to*, so the sun appears while
+ * dark is active and the moon while light is. Doing it in CSS rather than in
+ * JavaScript means the correct icon is in the very first paint, even before we
+ * know the device preference — which the server never sees.
+ */
+.icon-sun {
+  display: none;
+}
+.icon-moon {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-sun {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .icon-moon {
+    display: none;
+  }
+}
+
+:root[data-theme="dark"] .icon-sun {
+  display: block;
+}
+:root[data-theme="dark"] .icon-moon {
+  display: none;
 }
