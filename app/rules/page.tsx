@@ -6,7 +6,8 @@ const scoring = [
   {
     name: 'Each game against the spread',
     points: `${POINTS_SPREAD} pt`,
-    detail: 'Pick the winner against the spread. Pick as many or as few as you like.',
+    detail:
+      'Pick the winner against the spread, and pick every game — this is where most of the season’s points are won. Nothing forces you to, but a game you leave unpicked scores 0, and those add up faster than you would think.',
   },
   {
     name: 'Lock of the Week',
