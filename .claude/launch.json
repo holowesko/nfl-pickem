@@ -4,7 +4,7 @@
     {
       "name": "nfl-pickem",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3002"],
+      "runtimeArgs": ["run", "dev"],
       "port": 3002
     }
   ]

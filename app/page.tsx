@@ -31,7 +31,12 @@ export default async function ThisWeekPage() {
     return (
       <Empty
         title="No week loaded yet"
-        body="Run the sync job once to pull in the schedule and the opening lines."
+        body="Nothing has pulled in the schedule yet."
+        hint={
+          process.env.NODE_ENV === 'production'
+            ? 'Run the sync job once from the Actions tab.'
+            : 'npm run seed'
+        }
       />
     )
   }
@@ -163,11 +168,16 @@ export default async function ThisWeekPage() {
   )
 }
 
-function Empty({ title, body }: { title: string; body: string }) {
+function Empty({ title, body, hint }: { title: string; body: string; hint?: string }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
       <p className="text-muted">{body}</p>
+      {hint ? (
+        <p className="rounded-lg border border-border bg-surface-2 p-3 font-mono text-sm">
+          {hint}
+        </p>
+      ) : null}
     </div>
   )
 }

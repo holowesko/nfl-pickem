@@ -43,25 +43,37 @@ These two deadlines used to be one instant. Keeping them apart is the point:
 collapsing them would either freeze lines at kickoff (grading players on numbers
 they never saw) or close picks at 10am (which is what we moved away from).
 
-## Local setup
+## Running it locally
+
+Two terminals. In the first:
 
 ```bash
 npm install
 npm run dev
 ```
 
-That is the whole thing. With no `DATABASE_URL` set, the app runs against an
-embedded [PGlite](https://pglite.dev) database — real Postgres compiled to
-WASM, persisted to `.pglite/` — so there is no account to create and nothing to
-install. The schema is applied automatically on boot.
-
-To load the current week's games and lines, with the dev server running:
+In the second, once that says ready:
 
 ```bash
-curl -X POST http://localhost:3002/api/cron/sync -H "Authorization: Bearer dev-secret"
+npm run seed
 ```
 
-(`CRON_SECRET=dev-secret` lives in `.env.local`.)
+Then open **http://localhost:3002**.
+
+`npm run seed` pulls in the current week's real games and lines by asking the
+running app to do its normal sync, so it exercises exactly the code path the
+scheduled job uses in production. Run it again any time to refresh.
+
+With no `DATABASE_URL` set, the app runs against an embedded
+[PGlite](https://pglite.dev) database — real Postgres compiled to WASM,
+persisted to `.pglite/` — so there is no account to create and nothing to
+install, and the schema is applied automatically on boot.
+
+**This is a separate database from the live pool.** Picks made locally are
+yours alone and touch nothing in production. To start over, stop the dev server
+and delete the `.pglite/` folder.
+
+Port 3002 is deliberate, to stay clear of anything already using 3000.
 
 ## Tests
 
