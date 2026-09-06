@@ -5,6 +5,7 @@ import './globals.css'
 import { PLAYERS, currentPlayer } from '@/lib/players'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { BottomNav } from '@/components/BottomNav'
 import { currentTheme } from '@/lib/theme'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
@@ -53,27 +54,20 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
               <ThemeToggle />
             </div>
 
-            <nav className="flex items-center gap-4 whitespace-nowrap text-sm font-medium text-muted">
-              <Link href="/" className="hover:text-foreground">
-                Picks
-              </Link>
-              <Link href="/leaderboard" className="hover:text-foreground">
-                Leaderboard
-              </Link>
-              <Link href="/rules" className="hover:text-foreground">
-                Rules
-              </Link>
-            </nav>
-
             <PlayerPicker players={PLAYERS} currentId={player?.id} />
           </div>
         </header>
 
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">{children}</main>
 
-        <footer className="mx-auto w-full max-w-3xl px-4 py-6 text-xs text-muted">
+        <footer className="mx-auto w-full max-w-3xl px-4 pt-6 text-xs text-muted">
           Picks close at each kickoff. Lines freeze earlier so everyone plays the same number.
         </footer>
+
+        {/* Clears the fixed tab bar: its own height plus the phone's safe area. */}
+        <div aria-hidden="true" className="h-[4.5rem] pb-[env(safe-area-inset-bottom)]" />
+
+        <BottomNav />
       </body>
     </html>
   )
