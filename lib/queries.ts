@@ -1,5 +1,5 @@
 import { db, toNumber, type Row } from './db'
-import { lockTimeFor } from './time'
+import { spreadLockTimeFor } from './time'
 import type { Game, Pick, Side } from './scoring'
 import type { ImportedGame, Scoreboard } from './espn'
 
@@ -131,7 +131,7 @@ export async function freezeLockedSpreads(now: Date = new Date()): Promise<numbe
   let frozen = 0
 
   for (const row of pending) {
-    const lockAt = lockTimeFor(new Date(row.kickoff))
+    const lockAt = spreadLockTimeFor(new Date(row.kickoff))
     if (now.getTime() < lockAt.getTime()) continue
 
     const [snapshot] = (await sql`

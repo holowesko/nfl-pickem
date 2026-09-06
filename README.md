@@ -16,25 +16,32 @@ upset that lands is worth 4. A push scores 0 for everyone. Unpicked games score
 0 — nothing is auto-picked. One Lock and one Upset per week, both optional.
 Most points across the 18-week regular season wins.
 
-### Deadlines
+### Two deadlines, deliberately different
 
-All deadlines are US Eastern, shown to each player in their own time zone.
+**Picks close when the game kicks off.** Per game, no earlier. A Monday night
+game can be picked on Monday night. Anything unpicked at kickoff scores 0.
 
-| Games | Locks at |
+**The spread freezes earlier**, per window, so that all three players are graded
+on the same number no matter when they got their pick in. Times are US Eastern,
+displayed to each player in their own zone.
+
+| Games | Line freezes |
 |---|---|
 | Sunday and Monday | 10:00am ET Sunday |
 | Any other day | 10:00am ET that morning |
 | Anything kicking before 10:00am ET | 7:00am ET that morning |
 
-The middle row is written as a general rule rather than a list of weekdays
-because the schedule does not cooperate — the 2026 season opens on a
-*Wednesday*. The last row is what covers the international games, and it keys
-off kickoff time rather than a country flag so it also catches any other
-unusually early start.
+The middle row is a general rule rather than a list of weekdays because the
+schedule does not cooperate — the 2026 season opens on a *Wednesday*. The last
+row covers the international games, and it keys off kickoff time rather than a
+country flag so it also catches any other unusually early start.
 
-The graded spread is the one in place when the game&rsquo;s window locked, not
-the one showing when the pick was made — so all three players are always graded
-on the same number.
+Once a line has frozen, the card shows the frozen number, so what a player sees
+when picking is always what they are graded on.
+
+These two deadlines used to be one instant. Keeping them apart is the point:
+collapsing them would either freeze lines at kickoff (grading players on numbers
+they never saw) or close picks at 10am (which is what we moved away from).
 
 ## Local setup
 

@@ -2,7 +2,7 @@
 
 import { refresh } from 'next/cache'
 import { currentPlayer } from '@/lib/players'
-import { isLocked } from '@/lib/time'
+import { arePicksClosed } from '@/lib/time'
 import { isValidUpsetPick, type Side } from '@/lib/scoring'
 import { getGame, getPick, upsertPick, removePick, setWeeklyFlag } from '@/lib/queries'
 
@@ -22,7 +22,7 @@ async function requirePlayer() {
 async function requireOpenGame(gameId: string) {
   const game = await getGame(gameId)
   if (!game) throw new Error('That game is not on this week’s slate.')
-  if (isLocked(new Date(game.kickoff))) {
+  if (arePicksClosed(new Date(game.kickoff))) {
     throw new Error(`Picks for ${game.awayTeam} @ ${game.homeTeam} are locked.`)
   }
   return game

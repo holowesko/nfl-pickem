@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">{children}</main>
 
         <footer className="mx-auto w-full max-w-3xl px-4 py-6 text-xs text-muted">
-          All deadlines are US Eastern. Games kicking before 10:00am ET lock at 7:00am ET.
+          Picks close at each kickoff. Lines freeze earlier so everyone plays the same number.
         </footer>
       </body>
     </html>

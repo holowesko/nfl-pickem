@@ -10,7 +10,7 @@
  *   - an unpicked game is 0 — there is no auto-pick
  */
 
-import { isLocked } from './time'
+import { arePicksClosed } from './time'
 
 export type Side = 'home' | 'away'
 
@@ -214,7 +214,7 @@ export function validateWeekPicks(
     const game = gamesById.get(pick.gameId)
     if (!game) continue
 
-    if (isLocked(new Date(game.kickoff), now)) {
+    if (arePicksClosed(new Date(game.kickoff), now)) {
       errors.push({
         code: 'GAME_LOCKED',
         message: `Picks for ${game.awayTeam} @ ${game.homeTeam} are already locked.`,

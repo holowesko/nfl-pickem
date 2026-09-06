@@ -85,9 +85,11 @@ const EARLY_LOCK_HOUR_ET = 7
 const STANDARD_LOCK_HOUR_ET = 10
 
 /**
- * When picks for a given game close.
+ * When a game's spread freezes — the moment the number it will be graded on
+ * stops moving. This is NOT the pick deadline; see `picksCloseAt`.
  *
- * The rules, in order of precedence:
+ * Games are grouped into windows so that everyone in a window plays the same
+ * number. The rules, in order of precedence:
  *
  *  1. Any game kicking before 10:00am ET locks at 7:00am ET that morning. This
  *     is what covers the London / Berlin / Madrid games, and it is written as a
@@ -98,7 +100,7 @@ const STANDARD_LOCK_HOUR_ET = 10
  *     Thursday morning, Saturday games Saturday morning, Sunday games Sunday
  *     morning, and the occasional Friday/holiday game that morning too).
  */
-export function lockTimeFor(kickoff: Date): Date {
+export function spreadLockTimeFor(kickoff: Date): Date {
   const p = etParts(kickoff)
 
   if (p.hour < EARLY_KICKOFF_HOUR_ET) {
@@ -113,9 +115,33 @@ export function lockTimeFor(kickoff: Date): Date {
   return etWallToUtc(p.year, p.month, p.day, STANDARD_LOCK_HOUR_ET)
 }
 
-/** Has this game's pick deadline passed? */
-export function isLocked(kickoff: Date, now: Date = new Date()): boolean {
-  return now.getTime() >= lockTimeFor(kickoff).getTime()
+/**
+ * When picks close for a game: its own kickoff.
+ *
+ * This is deliberately a different instant from `spreadLockTimeFor`. The two
+ * used to be the same, and separating them is the point:
+ *
+ *   - The **spread** freezes early, per window, so all three players are graded
+ *     on the same number no matter when they picked.
+ *   - **Picks** stay open right up to kickoff, per game, so a Monday night game
+ *     can still be picked on Monday night.
+ *
+ * Keep them apart. Collapsing them again would either freeze the line at
+ * kickoff (so players are graded on numbers they never saw) or close picks at
+ * 10am (which is what we just moved away from).
+ */
+export function picksCloseAt(kickoff: Date): Date {
+  return kickoff
+}
+
+/** Has this game kicked off, and therefore stopped accepting picks? */
+export function arePicksClosed(kickoff: Date, now: Date = new Date()): boolean {
+  return now.getTime() >= picksCloseAt(kickoff).getTime()
+}
+
+/** Has this game's window closed, fixing the spread it will be graded on? */
+export function isSpreadLocked(kickoff: Date, now: Date = new Date()): boolean {
+  return now.getTime() >= spreadLockTimeFor(kickoff).getTime()
 }
 
 /**
@@ -123,7 +149,7 @@ export function isLocked(kickoff: Date, now: Date = new Date()): boolean {
  * UI ("Thursday", "Sunday + Monday", "Early kickoff").
  */
 export function lockWindowKey(kickoff: Date): string {
-  const lock = lockTimeFor(kickoff)
+  const lock = spreadLockTimeFor(kickoff)
   const p = etParts(lock)
   return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}T${String(p.hour).padStart(2, '0')}`
 }

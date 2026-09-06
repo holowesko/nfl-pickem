@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { setPick, clearPick, setLock, setUpset } from '@/app/picks-actions'
 import { formatSpread } from '@/lib/slate'
 import { underdogSide, type Side } from '@/lib/scoring'
+import { LocalTime } from './LocalTime'
 
 export type OtherPick = {
   playerId: string
@@ -26,7 +27,10 @@ export type GameCardData = {
   homeScore: number | null
   awayScore: number | null
   final: boolean
+  /** Kicked off — picks no longer accepted. */
   locked: boolean
+  /** Window closed — the graded spread is fixed, but picks may still be open. */
+  spreadLocked: boolean
 }
 
 export function GameCard({
@@ -47,9 +51,13 @@ export function GameCard({
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
-  // Once locked, the graded number is the frozen one; before that, the line
-  // that is still moving.
-  const spread = game.locked ? (game.lockedSpreadHome ?? game.spreadHome) : game.spreadHome
+  // Show the number this pick will actually be graded on. Once the window has
+  // closed that is the frozen line — which matters more now that picks stay
+  // open past the freeze, because someone picking Sunday afternoon must see the
+  // number they are playing, not one that has drifted since.
+  const spread = game.spreadLocked
+    ? (game.lockedSpreadHome ?? game.spreadHome)
+    : game.spreadHome
   const dog = underdogSide(spread)
   const noLine = spread === null
   const interactive = canPick && !game.locked && !noLine
@@ -79,8 +87,12 @@ export function GameCard({
         {game.final ? (
           <span className="font-semibold text-foreground">Final</span>
         ) : game.locked ? (
-          <span>Locked</span>
-        ) : null}
+          <span>Kicked off &middot; picks closed</span>
+        ) : (
+          // Picks stay open until this game kicks off, so the countdown that
+          // matters is this game's own, not its window's.
+          <LocalTime iso={game.kickoff} etLabel="" verb="picks close" relativeOnly />
+        )}
       </div>
 
       <div className="grid gap-2">

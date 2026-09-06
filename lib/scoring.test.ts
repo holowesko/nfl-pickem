@@ -180,9 +180,20 @@ test('validation rejects a second Lock, a second Upset, and a favored Upset', ()
   assert.ok(codes.includes('UPSET_NOT_UNDERDOG'), 'home is the -7 favorite')
 })
 
-test('validation rejects picks made after the deadline', () => {
+test('validation allows picks after the spread froze but before kickoff', () => {
+  const games = [game({ id: 'a' })] // Sunday 1pm ET kickoff
+  const afterSpreadLock = new Date('2026-09-13T15:00:00Z') // 11am ET Sunday
+  const errors = validateWeekPicks(games, [pick({ gameId: 'a' })], afterSpreadLock)
+  assert.equal(
+    errors.filter((e) => e.code === 'GAME_LOCKED').length,
+    0,
+    'the line is frozen by now, but the game has not kicked off'
+  )
+})
+
+test('validation rejects picks made after kickoff', () => {
   const games = [game({ id: 'a' })]
-  const afterLock = new Date('2026-09-13T15:00:00Z') // 11am ET Sunday
-  const errors = validateWeekPicks(games, [pick({ gameId: 'a' })], afterLock)
+  const afterKickoff = new Date('2026-09-13T17:00:01Z')
+  const errors = validateWeekPicks(games, [pick({ gameId: 'a' })], afterKickoff)
   assert.ok(errors.some((e) => e.code === 'GAME_LOCKED'))
 })

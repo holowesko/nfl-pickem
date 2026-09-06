@@ -22,14 +22,31 @@ with no database or network access. Every rule change belongs there and needs a
 test in the matching `*.test.ts` — run them with `npm test`. Do not scatter
 scoring logic into components or route handlers.
 
-Rules that are easy to get wrong and are pinned by tests:
+## Two deadlines, never one
 
-- Monday games lock with the **Sunday** window, not Monday morning.
+This is the single easiest thing to break. There are two distinct instants and
+they must not be merged:
+
+- `picksCloseAt` / `arePicksClosed` — **kickoff**, per game. Governs whether a
+  pick may be made or changed.
+- `spreadLockTimeFor` / `isSpreadLocked` — the **window** deadline, per group.
+  Governs which spread grades the pick, and the slate's grouping.
+
+They were one function once, and splitting them was a deliberate rule change.
+Collapsing them again would either grade players on a line they never saw, or
+close picks hours before kickoff.
+
+Other rules that are easy to get wrong and are pinned by tests:
+
+- Monday games freeze their line with the **Sunday** window, not Monday morning
+  — but stay pickable until Monday night kickoff.
 - The "early kickoff" rule keys off kickoff time (before 10:00am ET), not off a
   country flag, so it covers London, Berlin, Madrid, and anything else odd.
-- Everything else locks at 10am ET on its own day. Do not hard-code the set of
+- Everything else freezes at 10am ET on its own day. Do not hard-code the set of
   weekdays: the 2026 season opens on a Wednesday, and Friday and holiday games
   happen too.
+- The UI must show the **frozen** line once the window has closed, since players
+  keep picking after that point.
 
 ## Time
 

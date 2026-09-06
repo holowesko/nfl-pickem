@@ -1,4 +1,4 @@
-import { etParts, lockTimeFor, lockWindowKey, type Weekday } from './time'
+import { etParts, spreadLockTimeFor, lockWindowKey, type Weekday } from './time'
 import type { Game } from './scoring'
 
 const DAY_NAMES: Record<Weekday, string> = {
@@ -22,7 +22,7 @@ export type SlateGroup<T extends Game = Game> = {
 /**
  * Split a week into its lock windows, in kickoff order.
  *
- * The grouping comes from `lockTimeFor`, so the Sunday and Monday games land in
+ * The grouping comes from `spreadLockTimeFor`, so Sunday and Monday games land in
  * one group and an early international kickoff separates itself out — the UI
  * never has to know those rules, it just renders the groups it is handed.
  */
@@ -41,7 +41,7 @@ export function groupSlate<T extends Game>(games: T[]): SlateGroup<T>[] {
   }
 
   return [...groups.entries()].map(([key, groupGames]) => {
-    const lockAt = lockTimeFor(new Date(groupGames[0].kickoff))
+    const lockAt = spreadLockTimeFor(new Date(groupGames[0].kickoff))
     return { key, label: labelFor(groupGames, lockAt), lockAt: lockAt.toISOString(), games: groupGames }
   })
 }

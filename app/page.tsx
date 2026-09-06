@@ -2,11 +2,10 @@ import { isDatabaseConfigured } from '@/lib/db'
 import { currentPlayer, PLAYERS } from '@/lib/players'
 import { getCurrentWeek, getWeekGames, getWeekPicks } from '@/lib/queries'
 import { groupSlate } from '@/lib/slate'
-import { etParts, isLocked } from '@/lib/time'
+import { etParts, arePicksClosed, isSpreadLocked } from '@/lib/time'
 import { scoreWeek } from '@/lib/scoring'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { GameCard, type OtherPick } from '@/components/GameCard'
-import { LocalTime } from '@/components/LocalTime'
 
 function kickoffLabel(iso: string): string {
   const p = etParts(new Date(iso))
@@ -88,7 +87,7 @@ export default async function ThisWeekPage() {
       ) : null}
 
       {groups.map((group) => {
-        const groupLocked = isLocked(new Date(group.games[0].kickoff))
+        const spreadLocked = isSpreadLocked(new Date(group.games[0].kickoff))
 
         return (
           <section key={group.key} className="space-y-2">
@@ -97,11 +96,9 @@ export default async function ThisWeekPage() {
                 {group.label}
               </h2>
               <p className="text-xs text-muted">
-                {groupLocked ? (
-                  'Locked'
-                ) : (
-                  <LocalTime iso={group.lockAt} etLabel={deadlineLabel(group.lockAt)} />
-                )}
+                {spreadLocked
+                  ? 'Lines final'
+                  : `Lines freeze ${deadlineLabel(group.lockAt)}`}
               </p>
             </div>
 
@@ -134,7 +131,8 @@ export default async function ThisWeekPage() {
                       homeScore: game.homeScore,
                       awayScore: game.awayScore,
                       final: game.final,
-                      locked: isLocked(new Date(game.kickoff)),
+                      locked: arePicksClosed(new Date(game.kickoff)),
+                      spreadLocked: isSpreadLocked(new Date(game.kickoff)),
                     }}
                     mySide={mine?.side ?? null}
                     isLock={mine?.isLock ?? false}

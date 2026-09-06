@@ -18,7 +18,7 @@ import {
 import { groupSlate, formatSpread } from '../lib/slate'
 import { scoreWeek, underdogSide } from '../lib/scoring'
 import { db, type Row } from '../lib/db'
-import { lockTimeFor, etParts } from '../lib/time'
+import { spreadLockTimeFor, etParts } from '../lib/time'
 
 const fmt = (d: Date) => {
   const p = etParts(d)
@@ -103,7 +103,7 @@ ok('a hand-written second lock is refused', rejected)
 console.log('\n7. Freezing the graded line after a deadline passes')
 // Pretend it is one minute after this game's lock window closed.
 const target = games[0]
-const justAfterLock = new Date(lockTimeFor(new Date(target.kickoff)).getTime() + 60_000)
+const justAfterLock = new Date(spreadLockTimeFor(new Date(target.kickoff)).getTime() + 60_000)
 const frozen = await freezeLockedSpreads(justAfterLock)
 ok('at least one line frozen', frozen > 0, `${frozen} games`)
 const [reloaded] = (await sql`select locked_spread_home from games where id = ${target.id}`) as Row[]
