@@ -165,7 +165,7 @@ export default async function ThisWeekPage() {
         <BonusPicker
           kind="lock"
           label="Lock"
-          points={`+${POINTS_LOCK}`}
+          points={`${POINTS_LOCK} pts`}
           hint="One a week. Wins outright, spread be damned."
           options={lockOptions}
           selected={asOption('lock')}
@@ -176,7 +176,7 @@ export default async function ThisWeekPage() {
         <BonusPicker
           kind="upset"
           label="Upset"
-          points={`+${POINTS_UPSET}`}
+          points={`${POINTS_UPSET} pts`}
           hint="One a week. Underdogs only, must win outright."
           options={upsetOptions}
           selected={asOption('upset')}

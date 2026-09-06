@@ -7,14 +7,15 @@ passwords. One link, tap your name, make your picks.
 
 | | Points |
 |---|---|
-| Pick a game correctly against the spread | 1 |
-| **Lock of the Week** — your team wins outright | +2 |
-| **Upset of the Week** — your underdog wins outright | +3 |
+| Each game picked correctly against the spread | 1 |
+| **Lock of the Week** — your team wins outright | 2 |
+| **Upset of the Week** — your underdog wins outright | 3 |
 
-The Lock and the Upset are chosen once for the week from a dropdown, not
-attached to a spread pick — you can Lock a team without taking that game against
-the number. Do both and they stack, so a Lock that also covers is worth 3 and an
-upset that lands is worth 4.
+The Lock and the Upset are picks in their own right, each chosen once for the
+week from a dropdown, and are not attached to a spread pick — you can Lock a
+team without taking that game against the number. Because they are separate,
+one game can score twice: take a team against the spread and make them your
+Lock, and a win that also covers is worth 1 + 2.
 
 A push scores 0 for everyone. Unpicked games score 0 — nothing is auto-picked.
 One Lock and one Upset per week, both optional. Most points across the 18-week

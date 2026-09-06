@@ -4,21 +4,21 @@ export const metadata = { title: 'Rules · HoloPicks NFL Duel' }
 
 const scoring = [
   {
-    name: 'Every game',
+    name: 'Each game against the spread',
     points: `${POINTS_SPREAD} pt`,
     detail: 'Pick the winner against the spread. Pick as many or as few as you like.',
   },
   {
     name: 'Lock of the Week',
-    points: `+${POINTS_LOCK} pts`,
+    points: `${POINTS_LOCK} pts`,
     detail:
-      'One team, chosen for the week from anyone playing. It is its own pick — you do not have to take that game against the spread. If you do, and they cover as well, that game is worth 3.',
+      'A pick of its own, made once for the week from any team playing. Worth 2 if they win their game outright — the spread has nothing to do with it.',
   },
   {
     name: 'Upset of the Week',
-    points: `+${POINTS_UPSET} pts`,
+    points: `${POINTS_UPSET} pts`,
     detail:
-      'One underdog, chosen for the week. The dropdown only offers teams getting points, so it cannot be set on a favorite. Take that same dog against the spread too and a landing upset is worth 4.',
+      'A pick of its own, made once for the week from that week’s underdogs. Worth 3 if they win outright. The dropdown offers only teams getting points, so it cannot land on a favorite.',
   },
 ]
 
@@ -95,8 +95,12 @@ export default function RulesPage() {
           <li>A push — the result landing exactly on the number — scores 0 for everyone.</li>
           <li>Miss a kickoff and that game simply scores 0. Nothing is auto-picked.</li>
           <li>
-            The Lock and the Upset are optional, are chosen once for the whole week,
-            and may both sit on the same game.
+            The Lock and the Upset are optional, and may both sit on the same game.
+          </li>
+          <li>
+            They are separate from your spread picks, so one game can score twice: take
+            a team against the number <em>and</em> make them your Lock, and a win that
+            also covers is worth 1 + 2.
           </li>
           <li>
             Each game&rsquo;s picks are hidden until that game kicks off. You can see who
