@@ -38,3 +38,10 @@ export async function chooseTheme(theme: Theme) {
 
   refresh()
 }
+
+/** Forget who is using this device, so the name picker comes back. */
+export async function clearPlayer() {
+  const store = await cookies()
+  store.delete(PLAYER_COOKIE)
+  refresh()
+}
