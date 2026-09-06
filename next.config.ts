@@ -10,9 +10,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@electric-sql/pglite'],
 
   images: {
-    // Team logos. The source files are 500px squares that we draw at 28px, so
-    // letting Next resize them is worth the config.
-    remotePatterns: [new URL('https://a.espncdn.com/i/teamlogos/nfl/**')],
+    // Source files are 500px squares drawn at ~28px, so letting Next resize
+    // them is worth the config. Team logos live under /nfl/, the league shield
+    // under /leagues/.
+    remotePatterns: [new URL('https://a.espncdn.com/i/teamlogos/**')],
   },
 }
 

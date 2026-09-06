@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Link from 'next/link'
+import Image from 'next/image'
 import './globals.css'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { BottomNav } from '@/components/BottomNav'
@@ -48,20 +49,35 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
                 width="26"
                 height="26"
                 viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
+                strokeWidth="1.3"
                 strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
-                className="shrink-0 opacity-90"
+                className="shrink-0"
               >
                 {/* A pointed lens, not an ellipse — rounded ends read as an
                     eye at this size, points read as a football. */}
-                <path d="M2.6 12c2.7-3.7 5.8-5.5 9.4-5.5s6.7 1.8 9.4 5.5c-2.7 3.7-5.8 5.5-9.4 5.5S5.3 15.7 2.6 12z" />
-                <path d="M8 12h8" />
-                <path d="M9.6 10.1v3.8M12 9.8v4.4M14.4 10.1v3.8" />
+                <path
+                  className="ball-body"
+                  d="M2.6 12c2.7-3.7 5.8-5.5 9.4-5.5s6.7 1.8 9.4 5.5c-2.7 3.7-5.8 5.5-9.4 5.5S5.3 15.7 2.6 12z"
+                />
+                <path className="ball-mark" d="M8 12h8" />
+                <path className="ball-mark" d="M9.6 10.1v3.8M12 9.8v4.4M14.4 10.1v3.8" />
               </svg>
-              HoloPicks NFL Duel
+              <span className="flex items-center gap-1.5">
+                HoloPicks
+                {/* The shield stands in for the word, so it carries "NFL" as its
+                    alt text and the header still reads as its own name. */}
+                <Image
+                  src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png"
+                  alt="NFL"
+                  width={26}
+                  height={26}
+                  className="h-[1.45em] w-auto"
+                  priority
+                />
+                Duel
+              </span>
             </Link>
             <ThemeToggle />
           </div>

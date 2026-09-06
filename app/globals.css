@@ -28,9 +28,15 @@
   --upset: #8a3ffc;
 
   /* The header band: turf green, its yard lines, and the ink that sits on it. */
-  --field: #14532d;
+  --field: #175c30;
   --field-line: rgba(255, 255, 255, 0.07);
+  --field-hash: rgba(255, 255, 255, 0.085);
+  --field-mow: rgba(255, 255, 255, 0.028);
   --field-ink: #f1f7f3;
+
+  /* The ball is leather in both themes, like the turf it sits on. */
+  --ball: #8b4a26;
+  --ball-mark: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -48,8 +54,10 @@
     --upset: #b18cf5;
 
     /* Deeper on a dark page, so the band reads as turf rather than glowing. */
-    --field: #0b3122;
+    --field: #0e3a24;
     --field-line: rgba(255, 255, 255, 0.055);
+    --field-hash: rgba(255, 255, 255, 0.07);
+    --field-mow: rgba(255, 255, 255, 0.022);
     --field-ink: #e9f2ec;
   }
 }
@@ -67,8 +75,10 @@
   --lock: #f0b429;
   --upset: #b18cf5;
 
-  --field: #0b3122;
+  --field: #0e3a24;
   --field-line: rgba(255, 255, 255, 0.055);
+  --field-hash: rgba(255, 255, 255, 0.07);
+  --field-mow: rgba(255, 255, 255, 0.022);
   --field-ink: #e9f2ec;
 }
 
@@ -131,11 +141,46 @@ body {
  */
 .field-bar {
   background-color: var(--field);
+
+  /* Layered top to bottom: two rows of hash marks, the 5-yard lines they sit
+     between, broad mown stripes, and light falling from above. Every layer is
+     nearly transparent — together they should read as turf, and no single one
+     should be nameable. */
   background-image:
-    repeating-linear-gradient(
-      90deg,
-      var(--field-line) 0 1px,
-      transparent 1px 58px
-    );
+    repeating-linear-gradient(90deg, var(--field-hash) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(90deg, var(--field-hash) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(90deg, var(--field-line) 0 1px, transparent 1px 60px),
+    repeating-linear-gradient(90deg, var(--field-mow) 0 120px, transparent 120px 240px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.14));
+
+  /* The hash rows are short ticks, so they get a height and a position; the
+     rest fill the band. */
+  background-size:
+    100% 6px,
+    100% 6px,
+    auto,
+    auto,
+    auto;
+  background-position:
+    0 27%,
+    0 73%,
+    0 0,
+    0 0,
+    0 0;
+  background-repeat: repeat-x, repeat-x, repeat, repeat, no-repeat;
+
   color: var(--field-ink);
+}
+
+/*
+ * SVG presentation attributes do not resolve var(), so the ball's colours come
+ * from classes rather than fill="" / stroke="".
+ */
+.ball-body {
+  fill: var(--ball);
+  stroke: var(--ball-mark);
+}
+.ball-mark {
+  fill: none;
+  stroke: var(--ball-mark);
 }
