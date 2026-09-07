@@ -10,10 +10,17 @@ import {
 } from '@/lib/queries'
 import { groupSlate, formatSpread } from '@/lib/slate'
 import { etParts, arePicksClosed, isSpreadLocked } from '@/lib/time'
-import { scoreWeek, underdogSide, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
+import {
+  scoreWeek,
+  underdogSide,
+  spreadWinner,
+  POINTS_LOCK,
+  POINTS_UPSET,
+} from '@/lib/scoring'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { AvatarUploader } from '@/components/AvatarUploader'
+import { PickSummary, type SummaryRow } from '@/components/PickSummary'
 import { GameCard, type OtherPick } from '@/components/GameCard'
 import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
 
@@ -118,6 +125,47 @@ export default async function ThisWeekPage() {
     bonusesMade: bonuses.filter((bonus) => bonus.playerId === p.id).length,
   }))
 
+  const summaryRows: SummaryRow[] = games.map((game) => {
+    const revealed = arePicksClosed(new Date(game.kickoff))
+    const ats = spreadWinner(game)
+
+    return {
+      gameId: game.id,
+      away: game.awayTeam,
+      home: game.homeTeam,
+      kickoffLabel: kickoffLabel(game.kickoff),
+      revealed,
+      score:
+        game.final && game.homeScore !== null && game.awayScore !== null
+          ? `${game.awayScore}–${game.homeScore} final`
+          : null,
+      // Only populated once the game has kicked off; before that the array is
+      // empty and there is nothing in the payload to leak.
+      picks: revealed
+        ? PLAYERS.map((p) => {
+            const pick = picks.find((x) => x.playerId === p.id && x.gameId === game.id)
+            const bonus = (kind: 'lock' | 'upset') =>
+              bonuses.some(
+                (b) =>
+                  b.playerId === p.id &&
+                  b.kind === kind &&
+                  b.gameId === game.id &&
+                  b.side === pick?.side
+              )
+
+            return {
+              playerId: p.id,
+              team: pick ? (pick.side === 'home' ? game.homeTeam : game.awayTeam) : null,
+              isLock: bonus('lock'),
+              isUpset: bonus('upset'),
+              correct:
+                pick && ats && ats !== 'push' ? ats === pick.side : null,
+            }
+          })
+        : [],
+    }
+  })
+
   const lockOptions = bonusOptions(games, false)
   const upsetOptions = bonusOptions(games, true)
 
@@ -151,8 +199,11 @@ export default async function ThisWeekPage() {
 
       {player ? <AvatarUploader hasPhoto={avatars.has(player.id)} /> : null}
 
-      <div className="flex items-baseline justify-between gap-4">
-        <h1 className="text-2xl font-bold tracking-tight">Week {current.week}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight">Week {current.week}</h1>
+          <PickSummary week={current.week} players={PLAYERS} rows={summaryRows} />
+        </div>
         <p className="text-sm text-muted">{games.length} games</p>
       </div>
 
