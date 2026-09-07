@@ -131,6 +131,14 @@ is re-applied on every local boot.
 PGlite must stay in `serverExternalPackages` in `next.config.ts`; bundling it
 breaks its runtime file access.
 
+## Backups
+
+`/api/export` dumps every table as JSON, behind the same bearer secret as the
+sync. A weekly workflow commits it to `backups/snapshot.json`.
+
+Do not add avatars to that export. The repository is public and the backup is
+committed to it.
+
 ## Scheduling
 
 Scheduled work runs from GitHub Actions, not Vercel cron (the free plan caps at

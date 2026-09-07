@@ -138,6 +138,18 @@ image is cropped square and shrunk to 192px in the browser before upload, so a
 stored photo is a couple of kilobytes and lives in Postgres rather than in a
 separate blob service.
 
+## Backups
+
+The database is the live copy; a weekly snapshot is the safety net.
+`.github/workflows/backup.yml` fetches `/api/export` every Tuesday morning and
+commits it to `backups/snapshot.json`.
+
+It overwrites one file rather than writing dated copies, so git history gives
+every earlier week for free. If the Neon project were ever lost, every game,
+line, pick and result could be rebuilt from that file.
+
+Profile photos are excluded from the export, because this repository is public.
+
 ## Who can see what
 
 There is no authentication. The pool lives at an unlisted URL and is marked

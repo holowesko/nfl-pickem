@@ -1,0 +1,44 @@
+# Weekly snapshot of the pool's history, committed to this repository.
+#
+# The database is the live copy; this is the safety net. If the Neon project
+# were ever lost, every pick, line and result could be restored from git — and
+# because the snapshot overwrites one file, git history gives you every earlier
+# week for free rather than accumulating dated copies.
+#
+# Profile photos are excluded from the export: this repository is public.
+name: Weekly backup
+
+on:
+  schedule:
+    # Tuesday 12:00 UTC (8am ET) — after Monday night has settled and been scored.
+    - cron: '0 12 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch snapshot
+        run: |
+          mkdir -p backups
+          curl -sS -f "$APP_URL/api/export" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -o backups/snapshot.json
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backups/snapshot.json
+          # `[skip ci]` keeps Vercel from redeploying for a data-only commit.
+          git diff --staged --quiet \
+            || git commit -m "Backup $(date -u +%Y-%m-%d) [skip ci]"
+          git push
