@@ -6,6 +6,7 @@ import { arePicksClosed } from '@/lib/time'
 import { validateBonus, type BonusKind, type Side } from '@/lib/scoring'
 import {
   getGame,
+  getBonus,
   upsertPick,
   removePick,
   setBonus,
@@ -32,6 +33,30 @@ async function requireOpenGame(gameId: string) {
     throw new Error(`Picks for ${game.awayTeam} @ ${game.homeTeam} are closed.`)
   }
   return game
+}
+
+/**
+ * A Lock or Upset cannot be moved or cleared once the game it sits on has
+ * kicked off — otherwise a player could erase a bonus after watching it score,
+ * or after watching it fail. `chooseBonus` already checks the game being moved
+ * TO; this checks the one being moved FROM.
+ */
+async function requireBonusChangeable(
+  playerId: string,
+  season: number,
+  week: number,
+  kind: BonusKind
+) {
+  const existing = await getBonus(playerId, season, week, kind)
+  if (!existing) return
+
+  const game = await getGame(existing.gameId)
+  if (game && arePicksClosed(new Date(game.kickoff))) {
+    throw new Error(
+      `Your ${kind === 'lock' ? 'Lock' : 'Upset'} is settled — ` +
+        `${game.awayTeam} @ ${game.homeTeam} has already kicked off.`
+    )
+  }
 }
 
 function fail(error: unknown): ActionResult {
@@ -82,6 +107,8 @@ export async function chooseBonus(
     const problem = validateBonus(game, side, kind)
     if (problem) throw new Error(problem.message)
 
+    await requireBonusChangeable(player.id, game.season, game.week, kind)
+
     await setBonus(player.id, game.season, game.week, kind, gameId, side)
     refresh()
     return { ok: true }
@@ -97,6 +124,7 @@ export async function removeBonus(
 ): Promise<ActionResult> {
   try {
     const player = await requirePlayer()
+    await requireBonusChangeable(player.id, season, week, kind)
     await clearBonus(player.id, season, week, kind)
     refresh()
     return { ok: true }

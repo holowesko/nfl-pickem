@@ -371,3 +371,18 @@ export async function clearAvatar(playerId: string): Promise<void> {
   const sql = await db()
   await sql`delete from player_avatars where player_id = ${playerId}`
 }
+
+export async function getBonus(
+  playerId: string,
+  season: number,
+  week: number,
+  kind: BonusKind
+): Promise<Bonus | null> {
+  const sql = await db()
+  const [row] = (await sql`
+    select * from weekly_bonuses
+    where player_id = ${playerId} and season = ${season}
+      and week = ${week} and kind = ${kind}
+  `) as Row[]
+  return row ? toBonus(row) : null
+}
