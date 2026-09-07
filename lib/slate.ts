@@ -92,3 +92,19 @@ export function displaySpread(
   const favorite = spreadHome < 0 ? 'home' : 'away'
   return side === favorite ? formatSpread(spreadHome, side) : null
 }
+
+/** "Sun 9/13 · 1:00pm ET" — a game's kickoff, in the league's own time zone. */
+export function kickoffLabel(iso: string): string {
+  const p = etParts(new Date(iso))
+  const hour12 = p.hour % 12 === 0 ? 12 : p.hour % 12
+  const meridiem = p.hour < 12 ? 'am' : 'pm'
+  return `${p.weekday} ${p.month}/${p.day} · ${hour12}:${String(p.minute).padStart(2, '0')}${meridiem} ET`
+}
+
+/** "Sun 10:00am ET" — a deadline, without the date. */
+export function deadlineLabel(iso: string): string {
+  const p = etParts(new Date(iso))
+  const hour12 = p.hour % 12 === 0 ? 12 : p.hour % 12
+  const meridiem = p.hour < 12 ? 'am' : 'pm'
+  return `${p.weekday} ${hour12}:${String(p.minute).padStart(2, '0')}${meridiem} ET`
+}

@@ -16,9 +16,14 @@ A three-player NFL pick'em pool (Dad, John, Nick). No auth by design: one shared
 link, tap your name, cookie remembers it.
 
 Each game's picks are hidden from the other players until that game kicks off.
-That filtering MUST happen server-side, before the props are built — see
-`app/page.tsx`. Hiding picks inside a component still ships them to the browser,
-where anyone can read them out of the page source.
+That filtering MUST happen server-side, before the props are built. Hiding picks
+inside a component still ships them to the browser, where anyone can read them
+out of the page source.
+
+`lib/summary.ts` is where that rule lives for the Picks tab and the Leaderboard
+alike — an unrevealed game gets an empty `picks` array rather than a hidden one.
+Build any new view of other players' picks on `buildSummaryRows`, not on a fresh
+copy of the logic.
 
 ## Where the rules live
 

@@ -8,35 +8,16 @@ import {
   getAvatarVersions,
   type GameRow,
 } from '@/lib/queries'
-import { groupSlate, formatSpread } from '@/lib/slate'
-import { etParts, arePicksClosed, isSpreadLocked } from '@/lib/time'
-import {
-  scoreWeek,
-  underdogSide,
-  spreadWinner,
-  POINTS_LOCK,
-  POINTS_UPSET,
-} from '@/lib/scoring'
+import { groupSlate, formatSpread, kickoffLabel, deadlineLabel } from '@/lib/slate'
+import { arePicksClosed, isSpreadLocked } from '@/lib/time'
+import { scoreWeek, underdogSide, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
+import { buildSummaryRows } from '@/lib/summary'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { AvatarUploader } from '@/components/AvatarUploader'
-import { PickSummary, type SummaryRow } from '@/components/PickSummary'
+import { PickSummary } from '@/components/PickSummary'
 import { GameCard, type OtherPick } from '@/components/GameCard'
 import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
-
-function kickoffLabel(iso: string): string {
-  const p = etParts(new Date(iso))
-  const hour12 = p.hour % 12 === 0 ? 12 : p.hour % 12
-  const meridiem = p.hour < 12 ? 'am' : 'pm'
-  return `${p.weekday} ${p.month}/${p.day} · ${hour12}:${String(p.minute).padStart(2, '0')}${meridiem} ET`
-}
-
-function deadlineLabel(iso: string): string {
-  const p = etParts(new Date(iso))
-  const hour12 = p.hour % 12 === 0 ? 12 : p.hour % 12
-  const meridiem = p.hour < 12 ? 'am' : 'pm'
-  return `${p.weekday} ${hour12}:${String(p.minute).padStart(2, '0')}${meridiem} ET`
-}
 
 /**
  * Every team still pickable this week, one entry per side.
@@ -125,46 +106,7 @@ export default async function ThisWeekPage() {
     bonusesMade: bonuses.filter((bonus) => bonus.playerId === p.id).length,
   }))
 
-  const summaryRows: SummaryRow[] = games.map((game) => {
-    const revealed = arePicksClosed(new Date(game.kickoff))
-    const ats = spreadWinner(game)
-
-    return {
-      gameId: game.id,
-      away: game.awayTeam,
-      home: game.homeTeam,
-      kickoffLabel: kickoffLabel(game.kickoff),
-      revealed,
-      score:
-        game.final && game.homeScore !== null && game.awayScore !== null
-          ? `${game.awayScore}–${game.homeScore} final`
-          : null,
-      // Only populated once the game has kicked off; before that the array is
-      // empty and there is nothing in the payload to leak.
-      picks: revealed
-        ? PLAYERS.map((p) => {
-            const pick = picks.find((x) => x.playerId === p.id && x.gameId === game.id)
-            const bonus = (kind: 'lock' | 'upset') =>
-              bonuses.some(
-                (b) =>
-                  b.playerId === p.id &&
-                  b.kind === kind &&
-                  b.gameId === game.id &&
-                  b.side === pick?.side
-              )
-
-            return {
-              playerId: p.id,
-              team: pick ? (pick.side === 'home' ? game.homeTeam : game.awayTeam) : null,
-              isLock: bonus('lock'),
-              isUpset: bonus('upset'),
-              correct:
-                pick && ats && ats !== 'push' ? ats === pick.side : null,
-            }
-          })
-        : [],
-    }
-  })
+  const summaryRows = buildSummaryRows(games, picks, bonuses, PLAYERS)
 
   const lockOptions = bonusOptions(games, false)
   const upsetOptions = bonusOptions(games, true)
