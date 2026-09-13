@@ -1,18 +1,38 @@
 # Vercel's free tier allows only two cron jobs, once a day each - not enough for
-# a 7am lock, a 10am lock, and score updates. GitHub Actions runs the schedule
-# instead, and it is free.
-#
-# Scheduled runs can be delayed by several minutes under load, which is exactly
-# why the graded line is "the last snapshot at or before the lock time" rather
-# than "whatever we fetched at 10:00". Frequent polling matters; punctuality
-# does not.
+# a 7am lock, a 10am lock, and scores that move every few minutes. GitHub Actions
+# runs the schedule instead, and on a public repository it is free at any
+# frequency.
 name: Sync schedule, lines and scores
 
 on:
   schedule:
-    # Every 30 minutes. Cron here is UTC.
+    # Cron here is UTC, and GitHub runs these late under load — which is why the
+    # graded line is "the last snapshot at or before the lock time" rather than
+    # "whatever we fetched at 10:00". Frequency matters; punctuality does not.
+    #
+    # Baseline: every 30 minutes, all week. Enough to keep lines current.
     - cron: '*/30 * * * *'
+
+    # Game windows, every 5 minutes — the fastest GitHub allows. Scores are the
+    # only thing that moves this quickly, and only while games are being played.
+    # ET is UTC-4 in September and UTC-5 from November, so each window is widened
+    # by an hour to cover both.
+    - cron: '*/5 13-23 * * 0'   # Sunday, 9am ET through the afternoon games
+    - cron: '*/5 0-5 * * 1'     # Sunday night football, into Monday UTC
+    - cron: '*/5 0-5 * * 2'     # Monday night football, into Tuesday UTC
+    - cron: '*/5 0-5 * * 4'     # Wednesday night (the 2026 season opened on one)
+    - cron: '*/5 0-5 * * 5'     # Thursday night football
+    - cron: '*/5 17-23 * * 6'   # Saturday games, late season
+
   workflow_dispatch:
+
+# The baseline and game-window schedules land on the same minute twice an hour.
+# The job is idempotent so an overlap is harmless, but there is no point running
+# two at once — and none in queueing one behind the other, since the later run
+# fetches fresher data anyway.
+concurrency:
+  group: sync
+  cancel-in-progress: true
 
 jobs:
   sync:

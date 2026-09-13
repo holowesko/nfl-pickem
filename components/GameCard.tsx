@@ -58,6 +58,9 @@ export function GameCard({
   const spread = game.spreadLocked
     ? (game.lockedSpreadHome ?? game.spreadHome)
     : game.spreadHome
+  // Kicked off but not finished. Scores are already stored for games in
+  // progress, so the only thing missing was showing them.
+  const live = game.locked && !game.final
   const dog = underdogSide(spread)
   const noLine = spread === null
   const interactive = canPick && !game.locked && !noLine
@@ -86,8 +89,14 @@ export function GameCard({
         <span>{game.kickoffLabel}</span>
         {game.final ? (
           <span className="font-semibold text-foreground">Final</span>
-        ) : game.locked ? (
-          <span>Kicked off &middot; picks closed</span>
+        ) : live ? (
+          <span className="flex items-center gap-1.5 font-semibold text-accent">
+            <span
+              aria-hidden="true"
+              className="h-1.5 w-1.5 rounded-full bg-accent motion-safe:animate-pulse"
+            />
+            Live
+          </span>
         ) : (
           // Picks stay open until this game kicks off, so the countdown that
           // matters is this game's own, not its window's.
@@ -133,7 +142,7 @@ export function GameCard({
                       </span>
                     ) : null)}
                 </span>
-                {game.final && score !== null ? (
+                {(game.final || live) && score !== null ? (
                   <span className="w-6 text-right font-mono text-sm font-bold">{score}</span>
                 ) : null}
               </span>

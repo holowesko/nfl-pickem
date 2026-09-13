@@ -16,6 +16,7 @@ import { SetupChecklist } from '@/components/SetupChecklist'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { AvatarUploader } from '@/components/AvatarUploader'
 import { PickSummary } from '@/components/PickSummary'
+import { LiveRefresh } from '@/components/LiveRefresh'
 import { GameCard, type OtherPick } from '@/components/GameCard'
 import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
 
@@ -108,6 +109,11 @@ export default async function ThisWeekPage() {
 
   const summaryRows = buildSummaryRows(games, picks, bonuses, PLAYERS)
 
+  // Kicked off but not yet final. Only poll while that is true of something.
+  const anyLive = games.some(
+    (g) => arePicksClosed(new Date(g.kickoff)) && !g.final
+  )
+
   const lockOptions = bonusOptions(games, false)
   const upsetOptions = bonusOptions(games, true)
 
@@ -137,6 +143,8 @@ export default async function ThisWeekPage() {
 
   return (
     <div className="space-y-6">
+      {anyLive ? <LiveRefresh /> : null}
+
       <PlayerPicker players={PLAYERS} currentId={player?.id} />
 
       {player ? <AvatarUploader hasPhoto={avatars.has(player.id)} /> : null}
