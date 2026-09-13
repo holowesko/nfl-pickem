@@ -386,3 +386,47 @@ export async function getBonus(
   `) as Row[]
   return row ? toBonus(row) : null
 }
+
+/**
+ * Is a game in progress right now?
+ *
+ * The eight-hour bound keeps a postponed or abandoned game from looking live
+ * forever and holding the viewer-triggered sync open with it.
+ */
+export async function hasLiveGame(): Promise<boolean> {
+  const sql = await db()
+  const [row] = (await sql`
+    select count(*)::int as n from games
+    where final = false
+      and kickoff < now()
+      and kickoff > now() - interval '8 hours'
+  `) as Row[]
+  return Number(row?.n ?? 0) > 0
+}
+
+/**
+ * Claim the right to run a viewer-triggered sync, at most once per interval.
+ *
+ * The conditional UPDATE is the whole point: three people refreshing at once
+ * race for one row, exactly one wins, and the losers skip. Checking a timestamp
+ * and then writing it would let all three through.
+ */
+export async function claimLiveSync(minIntervalMs: number): Promise<boolean> {
+  const sql = await db()
+  const now = Date.now()
+
+  await sql`
+    insert into app_meta (key, value) values ('last_live_sync', '0')
+    on conflict (key) do nothing
+  `
+
+  const rows = (await sql`
+    update app_meta set value = ${String(now)}
+    where key = 'last_live_sync'
+      and value ~ '^[0-9]+$'
+      and value::bigint < ${String(now - minIntervalMs)}::bigint
+    returning key
+  `) as Row[]
+
+  return rows.length > 0
+}
