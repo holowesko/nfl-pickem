@@ -136,6 +136,25 @@ is re-applied on every local boot.
 PGlite must stay in `serverExternalPackages` in `next.config.ts`; bundling it
 breaks its runtime file access.
 
+## Insights
+
+`lib/insights.ts` follows the same shape as the scoring rules: pure generators,
+one per finding, each returning an `Insight` or `null`.
+
+The hard part is selection, not computation. Every generator returns a `score`,
+and only the top five reach a card — so a new generator competes for a slot
+rather than being added to a list. Two rules keep it honest:
+
+- Refuse to speak below a sample floor, and return `null` when a finding is
+  unremarkable. An even split is not a personality. Showing fewer than five
+  insights is the correct answer in a young season.
+- The headline is the joke; the detail is the evidence. The joke is never the
+  part that is untrue.
+
+Resist loosening a threshold to make a generator fire. It was silent on real
+week 1 data for `dithering` and `market-agreement`, and in both cases the data
+genuinely had no story — which is the design working.
+
 ## Backups
 
 `/api/export` dumps every table as JSON, behind the same bearer secret as the

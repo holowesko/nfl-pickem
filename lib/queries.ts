@@ -430,3 +430,44 @@ export async function claimLiveSync(minIntervalMs: number): Promise<boolean> {
 
   return rows.length > 0
 }
+
+/** A pick with the moments it was first made and last changed. */
+export type TimedPick = Pick & { firstAt: string; decidedAt: string }
+
+export async function getSeasonPickTimings(season: number): Promise<TimedPick[]> {
+  const sql = await db()
+  const rows = (await sql`
+    select p.player_id, p.game_id, p.side, p.created_at, p.updated_at
+    from picks p
+    join games g on g.id = p.game_id
+    where g.season = ${season}
+  `) as Row[]
+
+  return rows.map((r) => ({
+    playerId: r.player_id,
+    gameId: r.game_id,
+    side: r.side,
+    firstAt: new Date(r.created_at).toISOString(),
+    decidedAt: new Date(r.updated_at).toISOString(),
+  }))
+}
+
+export type SeasonSnapshot = { gameId: string; spreadHome: number; capturedAt: string }
+
+/** Every recorded line movement for a season, oldest first. */
+export async function getSeasonSnapshots(season: number): Promise<SeasonSnapshot[]> {
+  const sql = await db()
+  const rows = (await sql`
+    select s.game_id, s.spread_home, s.captured_at
+    from line_snapshots s
+    join games g on g.id = s.game_id
+    where g.season = ${season}
+    order by s.captured_at asc
+  `) as Row[]
+
+  return rows.map((r) => ({
+    gameId: r.game_id,
+    spreadHome: Number(r.spread_home),
+    capturedAt: new Date(r.captured_at).toISOString(),
+  }))
+}
