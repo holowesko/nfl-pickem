@@ -1,4 +1,5 @@
 import { spreadWinner, underdogSide, type Game, type Pick, type Bonus } from './scoring'
+import { timeSlot, TIME_SLOT_LABELS, type TimeSlot } from './slate'
 import type { TimedPick, SeasonSnapshot } from './queries'
 
 /**
@@ -83,6 +84,46 @@ function record(results: (boolean | null)[]): { won: number; lost: number; n: nu
   const won = decided.filter(Boolean).length
   const lost = decided.length - won
   return { won, lost, n: decided.length, rate: decided.length ? won / decided.length : 0 }
+}
+
+type TeamTally = { seen: number; backed: number; won: number; lost: number }
+
+/**
+ * Per team: how often the player had the chance to take them, how often he did,
+ * and how it went. Every pick backs one team and fades the other, so both sides
+ * of a game count as a sighting.
+ */
+function teamTallies(playerId: string, picks: Pick[], games: Game[]): Map<string, TeamTally> {
+  const gradedGames = new Map(graded(games).map((g) => [g.id, g]))
+  const tallies = new Map<string, TeamTally>()
+
+  const of = (team: string): TeamTally => {
+    const existing = tallies.get(team)
+    if (existing) return existing
+    const fresh = { seen: 0, backed: 0, won: 0, lost: 0 }
+    tallies.set(team, fresh)
+    return fresh
+  }
+
+  for (const p of picks) {
+    if (p.playerId !== playerId) continue
+    const game = gradedGames.get(p.gameId)
+    if (!game) continue
+
+    const taken = p.side === 'home' ? game.homeTeam : game.awayTeam
+    const faded = p.side === 'home' ? game.awayTeam : game.homeTeam
+
+    const backedTally = of(taken)
+    backedTally.seen += 1
+    backedTally.backed += 1
+    const result = covered(p, game)
+    if (result === true) backedTally.won += 1
+    else if (result === false) backedTally.lost += 1
+
+    of(faded).seen += 1
+  }
+
+  return tallies
 }
 
 // --- generators ------------------------------------------------------------
@@ -408,7 +449,118 @@ const sweatiness: Generator = ({ player, picks, games }) => {
   }
 }
 
+/**
+ * A team backed at nearly every opportunity.
+ *
+ * Needs several weeks by nature: a team plays once a week, so this cannot speak
+ * before week four, and it stays quiet until then.
+ */
+const teamLoyalty: Generator = ({ player, picks, games }) => {
+  const tallies = teamTallies(player.id, picks, games)
+
+  let best: { team: string; t: TeamTally } | null = null
+  for (const [team, t] of tallies) {
+    // Four sightings, matching the aversion floor. Three weeks of taking the
+    // same team is a coincidence; a month of it is a habit.
+    if (t.seen < 4) continue
+    if (t.backed / t.seen < 0.75) continue
+    if (!best || t.backed > best.t.backed) best = { team, t }
+  }
+  if (!best) return null
+
+  const { team, t } = best
+  const paying = t.won > t.lost
+  const always = t.backed === t.seen
+  const timesPhrase = always
+    ? `all ${t.seen} times they have played`
+    : `${t.backed} of the ${t.seen} times they have played`
+
+  return {
+    id: 'team-loyalty',
+    headline: paying
+      ? `${player.name}'s faith in ${team} is being repaid`
+      : `${player.name} keeps going back to ${team}, and ${team} keeps taking his money`,
+    detail: `Backed them ${timesPhrase}, going ${t.won}–${t.lost}.`,
+    sample: t.backed,
+    confidence: confidenceFor(t.backed),
+    tone: paying ? 'good' : 'bad',
+    score: score(0.4 + (t.backed / Math.max(t.seen, 1)) * 0.4, t.backed),
+  }
+}
+
+/** A team never trusted, whatever the number. */
+const teamAversion: Generator = ({ player, picks, games }) => {
+  const tallies = teamTallies(player.id, picks, games)
+
+  let worst: { team: string; t: TeamTally } | null = null
+  for (const [team, t] of tallies) {
+    // Four chances, not three. "Will not touch them" is a strong claim, and
+    // three sightings is the kind of thin evidence this tab exists to refuse.
+    if (t.seen < 4 || t.backed > 0) continue
+    if (!worst || t.seen > worst.t.seen) worst = { team, t }
+  }
+  if (!worst) return null
+
+  const { team, t } = worst
+  return {
+    id: 'team-aversion',
+    headline: `${player.name} will not touch ${team}`,
+    detail: `${t.seen} chances to take them, ${t.seen} times he looked the other way.`,
+    sample: t.seen,
+    confidence: confidenceFor(t.seen),
+    tone: 'neutral',
+    score: score(0.55, t.seen),
+  }
+}
+
+/** The part of the week where a player is unlike himself. */
+const bestSlot: Generator = ({ player, picks, games }) => {
+  const gradedGames = new Map(graded(games).map((g) => [g.id, g]))
+  const mine = picks.filter((p) => p.playerId === player.id && gradedGames.has(p.gameId))
+  const overall = record(mine.map((p) => covered(p, gradedGames.get(p.gameId)!)))
+  if (overall.n < 10) return null
+
+  const bySlot = new Map<TimeSlot, (boolean | null)[]>()
+  for (const p of mine) {
+    const game = gradedGames.get(p.gameId)!
+    const slot = timeSlot(game.kickoff)
+    const list = bySlot.get(slot)
+    if (list) list.push(covered(p, game))
+    else bySlot.set(slot, [covered(p, game)])
+  }
+
+  let best: Insight | null = null
+  for (const [slot, results] of bySlot) {
+    const r = record(results)
+    if (r.n < 6) continue
+
+    const gap = r.rate - overall.rate
+    if (Math.abs(gap) < 0.25) continue
+
+    const good = gap > 0
+    const label = TIME_SLOT_LABELS[slot]
+    const candidate: Insight = {
+      id: 'best-slot',
+      headline: good
+        ? `${player.name} is a different animal on ${label}`
+        : `${player.name} should be kept away from ${label}`,
+      detail: `${r.won}–${r.lost} there against ${overall.won}–${overall.lost} everywhere else combined.`,
+      sample: r.n,
+      confidence: confidenceFor(r.n),
+      tone: good ? 'good' : 'bad',
+      score: score(Math.abs(gap), r.n),
+    }
+
+    if (!best || candidate.score > best.score) best = candidate
+  }
+
+  return best
+}
+
 const GENERATORS: Generator[] = [
+  teamLoyalty,
+  teamAversion,
+  bestSlot,
   chalkOrDogs,
   betterSide,
   headToHead,

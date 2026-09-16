@@ -108,3 +108,52 @@ export function deadlineLabel(iso: string): string {
   const meridiem = p.hour < 12 ? 'am' : 'pm'
   return `${p.weekday} ${hour12}:${String(p.minute).padStart(2, '0')}${meridiem} ET`
 }
+
+/**
+ * Which part of the week a game belongs to.
+ *
+ * Driven by kickoff time in Eastern, never by a hard-coded set of weekdays —
+ * the 2026 season opened on a Wednesday, and Friday and holiday games happen.
+ * Anything kicking before 10am ET is an international game whatever the day.
+ */
+export type TimeSlot =
+  | 'early'
+  | 'thursday-night'
+  | 'saturday'
+  | 'sunday-early'
+  | 'sunday-late'
+  | 'sunday-night'
+  | 'monday-night'
+  | 'midweek'
+
+export function timeSlot(kickoff: string): TimeSlot {
+  const p = etParts(new Date(kickoff))
+
+  if (p.hour < 10) return 'early'
+
+  switch (p.weekday) {
+    case 'Thu':
+      return 'thursday-night'
+    case 'Sat':
+      return 'saturday'
+    case 'Mon':
+      return 'monday-night'
+    case 'Sun':
+      if (p.hour < 15) return 'sunday-early'
+      if (p.hour < 19) return 'sunday-late'
+      return 'sunday-night'
+    default:
+      return 'midweek'
+  }
+}
+
+export const TIME_SLOT_LABELS: Record<TimeSlot, string> = {
+  early: 'the early kickoff',
+  'thursday-night': 'Thursday night',
+  saturday: 'Saturday',
+  'sunday-early': 'the Sunday early games',
+  'sunday-late': 'the Sunday late games',
+  'sunday-night': 'Sunday night',
+  'monday-night': 'Monday night',
+  midweek: 'midweek games',
+}
