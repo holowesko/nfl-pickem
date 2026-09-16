@@ -13,7 +13,7 @@ import { buildFeed, type FeedEntry } from '@/lib/insights'
 import { InsightChartView } from '@/components/InsightChart'
 import { SetupChecklist } from '@/components/SetupChecklist'
 
-export const metadata = { title: 'Analysis · HoloPicks NFL Duel' }
+export const metadata = { title: 'The Feed · HoloPicks NFL Duel' }
 
 export default async function AnalysisPage() {
   if (!isDatabaseConfigured) return <SetupChecklist />
@@ -52,7 +52,7 @@ export default async function AnalysisPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Analysis</h1>
+        <h1 className="text-2xl font-bold tracking-tight">The Feed</h1>
         <p className="mt-1 text-sm text-muted">
           Everything the season has on the three of you, worst first.
         </p>
@@ -137,7 +137,7 @@ function FeedCard({
 function Empty({ body }: { body: string }) {
   return (
     <div className="space-y-2">
-      <h1 className="text-2xl font-bold tracking-tight">Analysis</h1>
+      <h1 className="text-2xl font-bold tracking-tight">The Feed</h1>
       <p className="text-muted">{body}</p>
     </div>
   )

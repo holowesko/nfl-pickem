@@ -42,12 +42,20 @@ const tabs = [
   },
   {
     href: '/analysis',
-    label: 'Analysis',
-    // A trend line rather than bars, so it does not read as the leaderboard.
+    label: 'The Feed',
+    // A wing, drawn as a drumette: meat, bone, knuckle.
+    //
+    // The first attempt was an ellipse on a stick and read as a magnifying
+    // glass — a circle on a line always will. What rescues it is the notch
+    // where the bone meets the meat, and making the meat big enough that the
+    // bone reads as an afterthought rather than a handle. Checked against a
+    // flat-wing outline (a fish) and a looping version (a stethoscope) at 22px
+    // before settling here.
     icon: (
       <>
-        <path d="M3 3v16a2 2 0 0 0 2 2h16" />
-        <path d="M7 14l3.5-4.5 3 3L18 7" />
+        <path d="M11.6 3.2a6.4 6.4 0 0 1 8.7 9.4c-1.7 1.6-4.2 1.7-6.2.7-1-.5-2.2-.3-3 .5l-1 1-3.1-3.1 1-1c.8-.8 1-2 .5-3-1-2-.8-4.5.9-6.2z" />
+        <path d="M7.9 14.1 6 16" />
+        <circle cx="4.7" cy="17.3" r="1.7" />
       </>
     ),
   },
