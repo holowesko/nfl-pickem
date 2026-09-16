@@ -23,6 +23,20 @@ import type { TimedPick, SeasonSnapshot } from './queries'
 export type Confidence = 'thin' | 'emerging' | 'established'
 export type Tone = 'good' | 'bad' | 'neutral'
 
+/**
+ * A small picture that makes the headline land harder.
+ *
+ * Three shapes only, on purpose. Every one is direct-labelled or sits directly
+ * under a record stated in words, so nothing is carried by colour alone.
+ */
+export type InsightChart =
+  /** Two proportions of a whole, each labelled. */
+  | { kind: 'split'; parts: { label: string; value: number }[] }
+  /** Win-loss records side by side. */
+  | { kind: 'bars'; bars: { label: string; won: number; lost: number }[] }
+  /** Results in the order they happened. True covered, false missed, null push. */
+  | { kind: 'strip'; results: (boolean | null)[]; caption?: string }
+
 export type Insight = {
   id: string
   /** The line that lands. Written to be read out loud. */
@@ -33,6 +47,7 @@ export type Insight = {
   confidence: Confidence
   tone: Tone
   score: number
+  chart?: InsightChart
 }
 
 export type InsightContext = {
@@ -158,6 +173,13 @@ const chalkOrDogs: Generator = ({ player, picks, games }) => {
     confidence: confidenceFor(mine.length),
     tone: 'neutral',
     score: score(deviation, mine.length),
+    chart: {
+      kind: 'split',
+      parts: [
+        { label: 'underdogs', value: onDogs.length },
+        { label: 'favorites', value: mine.length - onDogs.length },
+      ],
+    },
   }
 }
 
@@ -196,6 +218,13 @@ const betterSide: Generator = ({ player, picks, games }) => {
     confidence: confidenceFor(n),
     tone: 'neutral',
     score: score(Math.abs(gap), n),
+    chart: {
+      kind: 'bars',
+      bars: [
+        { label: 'underdogs', won: dogs.won, lost: dogs.lost },
+        { label: 'favorites', won: favs.won, lost: favs.lost },
+      ],
+    },
   }
 }
 
@@ -231,6 +260,7 @@ const headToHead: Generator = ({ player, others, picks, games }) => {
       confidence: confidenceFor(r.n),
       tone: winning ? 'good' : 'bad',
       score: score(deviation, r.n),
+      chart: { kind: 'strip', results, caption: `vs ${other.name}` },
     }
 
     if (!best || candidate.score > best.score) best = candidate
@@ -334,6 +364,13 @@ const bonusRecord: Generator = ({ player, bonuses, games }) => {
     confidence: confidenceFor(total),
     tone: rate >= 0.6 ? 'good' : 'neutral',
     score: score(Math.max(deviation, 0.35), total),
+    chart: {
+      kind: 'bars',
+      bars: [
+        { label: 'Locks', won: locks.won, lost: locks.lost },
+        { label: 'Upsets', won: upsets.won, lost: upsets.lost },
+      ],
+    },
   }
 }
 
@@ -469,7 +506,10 @@ const teamLoyalty: Generator = ({ player, picks, games }) => {
   if (!best) return null
 
   const { team, t } = best
+  // A .500 record is neither vindication nor a mugging, and saying either would
+  // be the joke outrunning the evidence.
   const paying = t.won > t.lost
+  const even = t.won === t.lost
   const always = t.backed === t.seen
   const timesPhrase = always
     ? `all ${t.seen} times they have played`
@@ -477,14 +517,20 @@ const teamLoyalty: Generator = ({ player, picks, games }) => {
 
   return {
     id: 'team-loyalty',
-    headline: paying
-      ? `${player.name}'s faith in ${team} is being repaid`
-      : `${player.name} keeps going back to ${team}, and ${team} keeps taking his money`,
+    headline: even
+      ? `${player.name} cannot quit ${team}, for no particular reason`
+      : paying
+        ? `${player.name}'s faith in ${team} is being repaid`
+        : `${player.name} keeps going back to ${team}, and ${team} keeps taking his money`,
     detail: `Backed them ${timesPhrase}, going ${t.won}–${t.lost}.`,
     sample: t.backed,
     confidence: confidenceFor(t.backed),
-    tone: paying ? 'good' : 'bad',
+    tone: even ? 'neutral' : paying ? 'good' : 'bad',
     score: score(0.4 + (t.backed / Math.max(t.seen, 1)) * 0.4, t.backed),
+    chart: {
+      kind: 'bars',
+      bars: [{ label: team, won: t.won, lost: t.lost }],
+    },
   }
 }
 
@@ -549,6 +595,17 @@ const bestSlot: Generator = ({ player, picks, games }) => {
       confidence: confidenceFor(r.n),
       tone: good ? 'good' : 'bad',
       score: score(Math.abs(gap), r.n),
+      chart: {
+        kind: 'bars',
+        bars: [
+          { label, won: r.won, lost: r.lost },
+          {
+            label: 'everywhere else',
+            won: overall.won - r.won,
+            lost: overall.lost - r.lost,
+          },
+        ],
+      },
     }
 
     if (!best || candidate.score > best.score) best = candidate
@@ -557,7 +614,151 @@ const bestSlot: Generator = ({ player, picks, games }) => {
   return best
 }
 
+/** Picks in the order they were played. */
+function chronological(playerId: string, picks: Pick[], games: Game[]) {
+  const gradedGames = new Map(graded(games).map((g) => [g.id, g]))
+  return picks
+    .filter((p) => p.playerId === playerId && gradedGames.has(p.gameId))
+    .map((p) => ({ pick: p, game: gradedGames.get(p.gameId)! }))
+    .sort((a, b) => new Date(a.game.kickoff).getTime() - new Date(b.game.kickoff).getTime())
+}
+
+/** A run of right or wrong that is still going. */
+const streak: Generator = ({ player, picks, games }) => {
+  const played = chronological(player.id, picks, games)
+  const results = played.map(({ pick, game }) => covered(pick, game))
+  const decided = results.filter((r) => r !== null) as boolean[]
+  if (decided.length < 6) return null
+
+  const last = decided[decided.length - 1]
+  let run = 0
+  for (let i = decided.length - 1; i >= 0 && decided[i] === last; i--) run += 1
+  if (run < 4) return null
+
+  return {
+    id: 'streak',
+    headline: last
+      ? `${player.name} cannot currently be stopped`
+      : `${player.name} has forgotten how this works`,
+    detail: last
+      ? `${run} right in a row, and insufferable about it.`
+      : `${run} wrong in a row. At this point it is a strategy.`,
+    sample: decided.length,
+    confidence: confidenceFor(decided.length),
+    tone: last ? 'good' : 'bad',
+    score: score(0.5 + run * 0.08, decided.length),
+    chart: { kind: 'strip', results: results.slice(-14), caption: 'most recent' },
+  }
+}
+
+/** Taking a side nobody else wanted. */
+const loneWolf: Generator = ({ player, others, picks, games }) => {
+  const gradedGames = new Map(graded(games).map((g) => [g.id, g]))
+  const results: (boolean | null)[] = []
+
+  for (const [id, game] of gradedGames) {
+    const mine = picks.find((p) => p.playerId === player.id && p.gameId === id)
+    if (!mine) continue
+    const theirs = others
+      .map((o) => picks.find((p) => p.playerId === o.id && p.gameId === id))
+      .filter((p): p is Pick => Boolean(p))
+    if (theirs.length < others.length) continue
+    if (!theirs.every((p) => p.side !== mine.side)) continue
+    results.push(covered(mine, game))
+  }
+
+  const r = record(results)
+  if (r.n < 4) return null
+
+  const deviation = Math.abs(r.rate - 0.5) * 2
+  if (deviation < 0.3) return null
+
+  const vindicated = r.rate > 0.5
+  return {
+    id: 'lone-wolf',
+    headline: vindicated
+      ? `${player.name} is right when everyone else is wrong`
+      : `${player.name} goes it alone and regrets it`,
+    detail: `${r.won}–${r.lost} on the ${r.n} games where he was the only one on his side.`,
+    sample: r.n,
+    confidence: confidenceFor(r.n),
+    tone: vindicated ? 'good' : 'bad',
+    score: score(deviation + 0.15, r.n),
+    chart: { kind: 'strip', results, caption: 'alone on an island' },
+  }
+}
+
+/** Faith in home cooking, or the lack of it. */
+const homer: Generator = ({ player, picks, games }) => {
+  const gradedGames = new Map(graded(games).map((g) => [g.id, g]))
+  const mine = picks.filter((p) => p.playerId === player.id && gradedGames.has(p.gameId))
+  if (mine.length < 10) return null
+
+  const home = mine.filter((p) => p.side === 'home').length
+  const rate = home / mine.length
+  const deviation = Math.abs(rate - 0.5) * 2
+  if (deviation < 0.35) return null
+
+  const homeward = rate > 0.5
+  return {
+    id: 'homer',
+    headline: homeward
+      ? `${player.name} believes in home cooking`
+      : `${player.name} does not trust a home crowd`,
+    detail: homeward
+      ? `${pct(rate)} of his picks are on the home side.`
+      : `${pct(1 - rate)} of his picks are on the road team.`,
+    sample: mine.length,
+    confidence: confidenceFor(mine.length),
+    tone: 'neutral',
+    score: score(deviation, mine.length),
+    chart: {
+      kind: 'split',
+      parts: [
+        { label: 'home', value: home },
+        { label: 'road', value: mine.length - home },
+      ],
+    },
+  }
+}
+
+/** The single worst beat of the season. Not a trend — a memory. */
+const worstBeat: Generator = ({ player, picks, games }) => {
+  const gradedGames = new Map(graded(games).map((g) => [g.id, g]))
+  let worst: { margin: number; team: string; opponent: string } | null = null
+
+  for (const p of picks.filter((x) => x.playerId === player.id)) {
+    const g = gradedGames.get(p.gameId)
+    if (!g || g.homeScore === null || g.awayScore === null || g.lockedSpreadHome === null) {
+      continue
+    }
+    if (covered(p, g) !== false) continue
+
+    const adjusted = g.homeScore - g.awayScore + g.lockedSpreadHome
+    const margin = Math.abs(adjusted)
+    const team = p.side === 'home' ? g.homeTeam : g.awayTeam
+    const opponent = p.side === 'home' ? g.awayTeam : g.homeTeam
+    if (!worst || margin > worst.margin) worst = { margin, team, opponent }
+  }
+
+  if (!worst || worst.margin < 17) return null
+
+  return {
+    id: 'worst-beat',
+    headline: `${player.name} still thinks about that ${worst.team} pick`,
+    detail: `Missed by ${worst.margin} points against ${worst.opponent}. Not close. Not ever close.`,
+    sample: 1,
+    confidence: 'established',
+    tone: 'bad',
+    score: score(0.45 + Math.min(worst.margin, 40) * 0.01, 8),
+  }
+}
+
 const GENERATORS: Generator[] = [
+  streak,
+  loneWolf,
+  homer,
+  worstBeat,
   teamLoyalty,
   teamAversion,
   bestSlot,
@@ -582,4 +783,38 @@ export function insightsFor(ctx: InsightContext, limit = 5): Insight[] {
     .filter((i): i is Insight => i !== null)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
+}
+
+export type FeedEntry = Insight & { player: { id: string; name: string } }
+
+/**
+ * One ranked feed across everybody, best line first.
+ *
+ * Sorting purely by score would let one player own a run of entries, which
+ * reads as a page about him rather than a feed about the pool. So the next
+ * entry is the strongest one that is not by whoever just spoke — a nudge, not
+ * a quota: if only one player has anything left to say, he says it.
+ */
+export function buildFeed(
+  contexts: InsightContext[],
+  { perPlayer = 6, limit = 18 } = {}
+): FeedEntry[] {
+  const remaining: FeedEntry[] = contexts
+    .flatMap((ctx) =>
+      insightsFor(ctx, perPlayer).map((insight) => ({ ...insight, player: ctx.player }))
+    )
+    .sort((a, b) => b.score - a.score)
+
+  const feed: FeedEntry[] = []
+  let previous: string | null = null
+
+  while (remaining.length > 0 && feed.length < limit) {
+    let index = remaining.findIndex((entry) => entry.player.id !== previous)
+    if (index === -1) index = 0
+    const [next] = remaining.splice(index, 1)
+    feed.push(next)
+    previous = next.player.id
+  }
+
+  return feed
 }
