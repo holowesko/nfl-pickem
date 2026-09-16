@@ -13,7 +13,14 @@ import { useRouter } from 'next/navigation'
  * Only rendered when a game is actually in progress — see `app/page.tsx`. There
  * is no point polling on a Tuesday.
  */
-export function LiveRefresh({ intervalMs = 45_000 }: { intervalMs?: number }) {
+export function LiveRefresh({
+  live,
+  intervalMs = 45_000,
+}: {
+  /** Is a game in progress? Controls polling, not whether we sync at all. */
+  live: boolean
+  intervalMs?: number
+}) {
   const router = useRouter()
 
   useEffect(() => {
@@ -41,14 +48,20 @@ export function LiveRefresh({ intervalMs = 45_000 }: { intervalMs?: number }) {
       if (!document.hidden) void sync()
     }
 
-    const timer = setInterval(tick, intervalMs)
+    // Always sync once on arrival, live or not. This is what rolls the pool
+    // over to a new week on a quiet Tuesday, when there is nothing to poll for
+    // and the scheduled job may be hours late.
+    void sync()
+
+    // Polling is only worth it while something is actually being played.
+    const timer = live ? setInterval(tick, intervalMs) : null
     document.addEventListener('visibilitychange', onVisible)
 
     return () => {
-      clearInterval(timer)
+      if (timer) clearInterval(timer)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [router, intervalMs])
+  }, [router, intervalMs, live])
 
   return null
 }

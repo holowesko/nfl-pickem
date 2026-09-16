@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseScoreboard } from './espn'
+import { parseScoreboard, isWeekComplete } from './espn'
 
 /** Minimal stand-in for an ESPN event, shaped like the real payload. */
 function event({
@@ -115,4 +115,33 @@ test('malformed events are skipped, not fatal', () => {
 
 test('a payload with no season is an error worth surfacing', () => {
   assert.throws(() => parseScoreboard({ events: [] }), /season and week/)
+})
+
+test('a week is complete only when every game is final', () => {
+  const board = (finals: boolean[]) => ({
+    season: 2026,
+    week: 1,
+    games: finals.map((final, i) => ({
+      id: String(i),
+      season: 2026,
+      week: 1,
+      kickoff: '2026-09-13T17:00:00Z',
+      homeTeam: 'KC',
+      awayTeam: 'DEN',
+      homeName: 'Chiefs',
+      awayName: 'Broncos',
+      spreadHome: -3,
+      homeScore: final ? 24 : null,
+      awayScore: final ? 20 : null,
+      final,
+    })),
+  })
+
+  assert.equal(isWeekComplete(board([true, true, true])), true)
+  assert.equal(isWeekComplete(board([true, false, true])), false)
+  assert.equal(isWeekComplete(board([false])), false)
+
+  // Asking for week 19 of an 18-week season returns nothing. Calling that
+  // "complete" would advance the pointer past the end of the schedule.
+  assert.equal(isWeekComplete(board([])), false)
 })

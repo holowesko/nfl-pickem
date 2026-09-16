@@ -143,7 +143,7 @@ export default async function ThisWeekPage() {
 
   return (
     <div className="space-y-6">
-      {anyLive ? <LiveRefresh /> : null}
+      <LiveRefresh live={anyLive} />
 
       <PlayerPicker players={PLAYERS} currentId={player?.id} />
 

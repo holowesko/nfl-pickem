@@ -1,5 +1,5 @@
 import { assertCronRequest } from '@/lib/cron-auth'
-import { fetchCurrentScoreboard, fetchWeek } from '@/lib/espn'
+import { fetchCurrentScoreboard, fetchWeek, isWeekComplete } from '@/lib/espn'
 import { syncScoreboard, freezeLockedSpreads, setCurrentWeek } from '@/lib/queries'
 
 /**
@@ -30,20 +30,38 @@ export async function POST(request: Request) {
           )
         : await fetchCurrentScoreboard()
 
-    const { games, snapshots } = await syncScoreboard(board)
+    let current = board
+    let { games, snapshots } = await syncScoreboard(board)
 
     // Only the live sync should move the pointer; a backfill of week 3 must not
     // drag the app back to week 3.
     if (weekParam === null) {
-      await setCurrentWeek(board.season, board.week)
+      // ESPN's own "current week" lingers on a finished week for a day or more
+      // — it still said week 1 on the Tuesday after week 1 ended, while week 2
+      // lines were already posted. So read the schedule rather than trusting
+      // that pointer: once every game in a week has been played, move on.
+      if (isWeekComplete(board)) {
+        const next = await fetchWeek(board.season, board.week + 1).catch(() => null)
+
+        // Guard against the end of the season and against ESPN handing back
+        // something other than what was asked for.
+        if (next && next.games.length > 0 && next.week === board.week + 1) {
+          const added = await syncScoreboard(next)
+          games += added.games
+          snapshots += added.snapshots
+          current = next
+        }
+      }
+
+      await setCurrentWeek(current.season, current.week)
     }
 
     const frozen = await freezeLockedSpreads()
 
     return Response.json({
       ok: true,
-      season: board.season,
-      week: board.week,
+      season: current.season,
+      week: current.week,
       games,
       snapshots,
       frozen,

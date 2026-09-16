@@ -146,3 +146,14 @@ export async function fetchWeek(season: number, week: number): Promise<Scoreboar
   const url = `${SCOREBOARD}?dates=${season}&seasontype=2&week=${week}`
   return parseScoreboard(await get(url))
 }
+
+/**
+ * Has every game in this week been played?
+ *
+ * A week with no games at all is not complete — that is the shape of asking for
+ * week 19 of an 18-week regular season, and treating it as finished would walk
+ * the pointer off the end of the schedule.
+ */
+export function isWeekComplete(board: Scoreboard): boolean {
+  return board.games.length > 0 && board.games.every((g) => g.final)
+}
