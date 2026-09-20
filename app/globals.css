@@ -206,3 +206,50 @@ body {
   fill: none;
   stroke: var(--ball-mark);
 }
+
+/*
+ * The live chyron on the Picks tab.
+ *
+ * The track carries two copies of the list and slides exactly half its width,
+ * so when the animation restarts the second copy is already where the first
+ * began and the loop has no visible seam.
+ *
+ * Content travels right to left, the way every news ticker does, because that
+ * is the direction that lets a sentence be read as it passes rather than
+ * arriving backwards.
+ */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation-name: ticker-slide;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes ticker-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Hovering to read a line should not require chasing it. */
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+  animation-play-state: paused;
+}
+
+/*
+ * Motion off: stop the slide and let the row be swiped instead, so the content
+ * is still reachable rather than clipped at the first line.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ticker {
+    overflow-x: auto;
+  }
+  .ticker-track {
+    animation: none;
+  }
+}

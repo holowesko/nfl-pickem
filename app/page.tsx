@@ -6,19 +6,19 @@ import {
   getWeekPicks,
   getWeekBonuses,
   getAvatarVersions,
-  hasSubscription,
   type GameRow,
 } from '@/lib/queries'
 import { groupSlate, formatSpread, kickoffLabel, deadlineLabel } from '@/lib/slate'
 import { arePicksClosed, isSpreadLocked } from '@/lib/time'
 import { scoreWeek, underdogSide, POINTS_LOCK, POINTS_UPSET } from '@/lib/scoring'
 import { buildSummaryRows } from '@/lib/summary'
+import { liveEntries } from '@/lib/live'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { AvatarUploader } from '@/components/AvatarUploader'
-import { NotificationToggle } from '@/components/NotificationToggle'
 import { PickSummary } from '@/components/PickSummary'
 import { LiveRefresh } from '@/components/LiveRefresh'
+import { LiveTicker } from '@/components/LiveTicker'
 import { GameCard, type OtherPick } from '@/components/GameCard'
 import { BonusPicker, type BonusOption } from '@/components/BonusPicker'
 
@@ -79,12 +79,11 @@ export default async function ThisWeekPage() {
     )
   }
 
-  const [games, picks, bonuses, avatars, notifying] = await Promise.all([
+  const [games, picks, bonuses, avatars] = await Promise.all([
     getWeekGames(current.season, current.week),
     getWeekPicks(current.season, current.week),
     getWeekBonuses(current.season, current.week),
     getAvatarVersions(),
-    player ? hasSubscription(player.id) : Promise.resolve(false),
   ])
 
   if (games.length === 0) {
@@ -117,6 +116,10 @@ export default async function ThisWeekPage() {
     (g) => arePicksClosed(new Date(g.kickoff)) && !g.final
   )
 
+  // The top few of what the Feed is saying right now, brought to the tab people
+  // are actually on while the games are being played.
+  const ticker = liveEntries({ players: PLAYERS, games, picks, bonuses }, 5)
+
   const lockOptions = bonusOptions(games, false)
   const upsetOptions = bonusOptions(games, true)
 
@@ -148,14 +151,11 @@ export default async function ThisWeekPage() {
     <div className="space-y-6">
       <LiveRefresh live={anyLive} />
 
+      <LiveTicker entries={ticker} avatars={avatars} />
+
       <PlayerPicker players={PLAYERS} currentId={player?.id} />
 
-      {player ? (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <AvatarUploader hasPhoto={avatars.has(player.id)} />
-          <NotificationToggle enabled={notifying} />
-        </div>
-      ) : null}
+      {player ? <AvatarUploader hasPhoto={avatars.has(player.id)} /> : null}
 
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
