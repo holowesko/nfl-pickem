@@ -155,6 +155,21 @@ Resist loosening a threshold to make a generator fire. It was silent on real
 week 1 data for `dithering` and `market-agreement`, and in both cases the data
 genuinely had no story — which is the design working.
 
+## Live entries
+
+`lib/live.ts` is a different animal from `lib/insights.ts` and the two must not
+be merged. Season insights describe a tendency and have to earn a slot with a
+sample size; live entries describe a moment and are true only while it lasts.
+
+So live entries carry no confidence and no `n`, are never persisted, and are
+recomputed on every render. Do not give them a sample floor — "down 17" needs
+no evidence, it is just the score.
+
+The copy must never claim to know the game clock. ESPN sends the quarter and
+time remaining and we do not store it, so "down 17" is safe and "down 17 in the
+fourth" is a lie. Adding two columns would fix that; until then, keep the copy
+honest about what we know.
+
 ## Backups
 
 `/api/export` dumps every table as JSON, behind the same bearer secret as the
