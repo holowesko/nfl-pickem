@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { liveEntries, type LiveContext } from './live'
+import { liveEntries, notableEntries, type LiveContext } from './live'
 import type { Game, Pick, Bonus } from './scoring'
 
 const PLAYERS = [
@@ -224,4 +224,79 @@ test('the section mixes players rather than letting one dominate', () => {
       assert.equal(othersLeft, false, 'repeat only when nobody else is left')
     }
   }
+})
+
+// --- what is worth a notification -----------------------------------------
+
+test('the noisy entries are never notable', () => {
+  // A pick on the hook and a lone wolf both change every few minutes.
+  const hooked = game({ id: 'a', homeScore: 18, awayScore: 10 })
+  const island = game({ id: 'b', homeScore: 30, awayScore: 10 })
+  const picks: Pick[] = [
+    { playerId: 'dad', gameId: 'a', side: 'home' },
+    { playerId: 'dad', gameId: 'b', side: 'home' },
+    { playerId: 'john', gameId: 'b', side: 'away' },
+    { playerId: 'nick', gameId: 'b', side: 'away' },
+  ]
+
+  const found = liveEntries(ctx({ games: [hooked, island], picks }))
+  assert.ok(found.some((e) => e.id.startsWith('hook-')), 'hook entry still shown')
+  assert.ok(found.some((e) => e.id.startsWith('lone-')), 'lone entry still shown')
+  assert.deepEqual(notableEntries(found), [], 'but neither is worth a push')
+})
+
+test('a bonus being dismantled is notable', () => {
+  const blowout = game({ homeScore: 31, awayScore: 14 })
+  const bonuses: Bonus[] = [
+    { playerId: 'dad', week: 2, kind: 'lock', gameId: 'g1', side: 'away' },
+  ]
+  const notable = notableEntries(liveEntries(ctx({ games: [blowout], bonuses })))
+  assert.equal(notable.length, 1)
+  assert.match(notable[0].headline, /dismantled/)
+})
+
+test('a Lock merely losing is shown but not pushed', () => {
+  // Down 3 is not a story yet; it will be different in ten minutes.
+  const close = game({ homeScore: 17, awayScore: 14 })
+  const bonuses: Bonus[] = [
+    { playerId: 'dad', week: 2, kind: 'lock', gameId: 'g1', side: 'away' },
+  ]
+  const found = liveEntries(ctx({ games: [close], bonuses }))
+  assert.ok(found.some((e) => e.id === 'bonus-dad-lock'))
+  assert.deepEqual(notableEntries(found), [])
+})
+
+test('an Upset landing is notable', () => {
+  const upsetOn = game({ homeScore: 14, awayScore: 21 })
+  const bonuses: Bonus[] = [
+    { playerId: 'nick', week: 2, kind: 'upset', gameId: 'g1', side: 'away' },
+  ]
+  const notable = notableEntries(liveEntries(ctx({ games: [upsetOn], bonuses })))
+  assert.equal(notable.length, 1)
+  assert.equal(notable[0].tone, 'good')
+})
+
+test('a blank day is notable, an ordinary day is not', () => {
+  const push = (id: string, homeScore: number) =>
+    game({ id, final: true, homeScore, awayScore: 10 })
+
+  // John gets nothing right: KC -7 fails at 10-10 three times.
+  const allWrong = [push('a', 10), push('b', 10), push('c', 10)]
+  const johnPicks: Pick[] = allWrong.map((g) => ({
+    playerId: 'john',
+    gameId: g.id,
+    side: 'home',
+  }))
+  const blank = notableEntries(liveEntries(ctx({ games: allWrong, picks: johnPicks })))
+  assert.ok(blank.some((e) => e.id === 'day-john'))
+
+  // A mixed day says nothing worth a buzz.
+  const mixed = [push('d', 30), push('e', 30), push('f', 10)]
+  const dadPicks: Pick[] = mixed.map((g) => ({
+    playerId: 'dad',
+    gameId: g.id,
+    side: 'home',
+  }))
+  const ordinary = notableEntries(liveEntries(ctx({ games: mixed, picks: dadPicks })))
+  assert.equal(ordinary.find((e) => e.id === 'day-dad'), undefined)
 })

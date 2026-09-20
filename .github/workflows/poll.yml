@@ -45,3 +45,14 @@ jobs:
         env:
           APP_URL: ${{ secrets.APP_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+      # Notifications only matter when nobody is watching, which is exactly
+      # when the rest of this app does nothing. Runs right after the sync so it
+      # is reading scores that are seconds old.
+      - name: Send notifications for anything worth a buzz
+        run: |
+          curl -sS -f -X POST "$APP_URL/api/cron/notify" \
+            -H "Authorization: Bearer $CRON_SECRET"
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

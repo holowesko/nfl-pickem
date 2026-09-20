@@ -471,3 +471,75 @@ export async function getSeasonSnapshots(season: number): Promise<SeasonSnapshot
     capturedAt: new Date(r.captured_at).toISOString(),
   }))
 }
+
+// --- web push --------------------------------------------------------------
+
+export type PushSubscriptionRow = {
+  endpoint: string
+  playerId: string
+  p256dh: string
+  auth: string
+}
+
+export async function saveSubscription(sub: PushSubscriptionRow): Promise<void> {
+  const sql = await db()
+  await sql`
+    insert into push_subscriptions (endpoint, player_id, p256dh, auth)
+    values (${sub.endpoint}, ${sub.playerId}, ${sub.p256dh}, ${sub.auth})
+    on conflict (endpoint) do update set
+      player_id = excluded.player_id,
+      p256dh = excluded.p256dh,
+      auth = excluded.auth
+  `
+}
+
+/** Drop a subscription the push service has told us is dead. */
+export async function removeSubscription(endpoint: string): Promise<void> {
+  const sql = await db()
+  await sql`delete from push_subscriptions where endpoint = ${endpoint}`
+}
+
+export async function getSubscriptions(): Promise<PushSubscriptionRow[]> {
+  const sql = await db()
+  const rows = (await sql`
+    select endpoint, player_id, p256dh, auth from push_subscriptions
+  `) as Row[]
+  return rows.map((r) => ({
+    endpoint: r.endpoint,
+    playerId: r.player_id,
+    p256dh: r.p256dh,
+    auth: r.auth,
+  }))
+}
+
+export async function hasSubscription(playerId: string): Promise<boolean> {
+  const sql = await db()
+  const [row] = (await sql`
+    select count(*)::int as n from push_subscriptions where player_id = ${playerId}
+  `) as Row[]
+  return Number(row?.n ?? 0) > 0
+}
+
+/**
+ * Claim an entry for announcing, once.
+ *
+ * Returns the keys that had not been announced before, having just recorded
+ * them. The insert is the claim, so two pollers running at once cannot both
+ * send the same notification.
+ */
+export async function claimAnnouncements(keys: string[]): Promise<string[]> {
+  if (keys.length === 0) return []
+  const sql = await db()
+  const claimed: string[] = []
+
+  for (const key of keys) {
+    const rows = (await sql`
+      insert into announced_entries (key) values (${key})
+      on conflict (key) do nothing
+      returning key
+    `) as Row[]
+    if (rows.length > 0) claimed.push(key)
+  }
+
+  return claimed
+}

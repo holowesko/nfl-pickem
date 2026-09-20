@@ -29,6 +29,16 @@ export type LiveEntry = {
   tone: Tone
   /** Higher sorts first. A Lock in trouble beats a passing observation. */
   urgency: number
+  /**
+   * Worth pushing to a phone.
+   *
+   * Deliberately narrow. Most live entries change every few minutes — a pick on
+   * the hook, a lone wolf, a Lock merely losing — and notifying on those would
+   * have everyone muting this by week four. Only moments that happen once and
+   * mean something qualify: a bonus pick collapsing, an Upset landing, a whole
+   * day going wrong.
+   */
+  notable?: boolean
 }
 
 export type LiveContext = {
@@ -110,6 +120,7 @@ const bonusWatch: LiveGenerator = ({ players, games, bonuses }, now) => {
         detail: `${team} down ${Math.abs(margin)}. That is ${points} points evaporating in real time.`,
         tone: 'bad',
         urgency: 100 + Math.abs(margin),
+        notable: true,
       })
     } else if (margin < 0) {
       entries.push({
@@ -137,6 +148,7 @@ const bonusWatch: LiveGenerator = ({ players, games, bonuses }, now) => {
         detail: `${team} lead by ${margin} as underdogs. He will not shut up about this.`,
         tone: 'good',
         urgency: 95,
+        notable: true,
       })
     } else {
       entries.push({
@@ -183,6 +195,7 @@ const sweepWatch: LiveGenerator = ({ players, games, picks }, now) => {
           : `${team} clear of the number by ${margin}. Nobody gains anything.`,
       tone: margin < 0 ? 'bad' : 'neutral',
       urgency: margin < 0 ? 80 : 40,
+      notable: margin < 0,
     })
   }
 
@@ -306,6 +319,7 @@ const dayRecord: LiveGenerator = ({ players, games, picks }, now) => {
           : `${won} right, ${lost} wrong, with the rest still out there.`,
       tone: blanked ? 'bad' : perfect ? 'good' : 'neutral',
       urgency: blanked ? 72 : perfect ? 68 : 30,
+      notable: blanked || perfect,
     })
   }
 
@@ -345,4 +359,9 @@ export function liveEntries(ctx: LiveContext, limit = 8): LiveEntry[] {
   }
 
   return out
+}
+
+/** The handful of live entries worth interrupting somebody's afternoon for. */
+export function notableEntries(entries: LiveEntry[]): LiveEntry[] {
+  return entries.filter((entry) => entry.notable === true)
 }

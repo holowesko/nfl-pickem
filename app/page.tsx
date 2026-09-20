@@ -6,6 +6,7 @@ import {
   getWeekPicks,
   getWeekBonuses,
   getAvatarVersions,
+  hasSubscription,
   type GameRow,
 } from '@/lib/queries'
 import { groupSlate, formatSpread, kickoffLabel, deadlineLabel } from '@/lib/slate'
@@ -15,6 +16,7 @@ import { buildSummaryRows } from '@/lib/summary'
 import { SetupChecklist } from '@/components/SetupChecklist'
 import { PlayerPicker } from '@/components/PlayerPicker'
 import { AvatarUploader } from '@/components/AvatarUploader'
+import { NotificationToggle } from '@/components/NotificationToggle'
 import { PickSummary } from '@/components/PickSummary'
 import { LiveRefresh } from '@/components/LiveRefresh'
 import { GameCard, type OtherPick } from '@/components/GameCard'
@@ -77,11 +79,12 @@ export default async function ThisWeekPage() {
     )
   }
 
-  const [games, picks, bonuses, avatars] = await Promise.all([
+  const [games, picks, bonuses, avatars, notifying] = await Promise.all([
     getWeekGames(current.season, current.week),
     getWeekPicks(current.season, current.week),
     getWeekBonuses(current.season, current.week),
     getAvatarVersions(),
+    player ? hasSubscription(player.id) : Promise.resolve(false),
   ])
 
   if (games.length === 0) {
@@ -147,7 +150,12 @@ export default async function ThisWeekPage() {
 
       <PlayerPicker players={PLAYERS} currentId={player?.id} />
 
-      {player ? <AvatarUploader hasPhoto={avatars.has(player.id)} /> : null}
+      {player ? (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <AvatarUploader hasPhoto={avatars.has(player.id)} />
+          <NotificationToggle enabled={notifying} />
+        </div>
+      ) : null}
 
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
