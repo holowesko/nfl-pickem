@@ -1,11 +1,11 @@
 {
-  "exportedAt": "2026-11-10T19:16:04.201Z",
+  "exportedAt": "2026-11-17T20:26:06.900Z",
   "counts": {
     "players": 3,
-    "games": 150,
-    "picks": 402,
-    "weeklyBonuses": 54,
-    "lineSnapshots": 464
+    "games": 163,
+    "picks": 434,
+    "weeklyBonuses": 60,
+    "lineSnapshots": 514
   },
   "players": [
     {
@@ -2222,7 +2222,7 @@
       "home_score": 10,
       "away_score": 33,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.872Z"
+      "updated_at": "2026-11-11T00:57:56.139Z"
     },
     {
       "id": "401873038",
@@ -2240,7 +2240,7 @@
       "home_score": 17,
       "away_score": 34,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.889Z"
+      "updated_at": "2026-11-11T00:57:56.172Z"
     },
     {
       "id": "401873039",
@@ -2258,7 +2258,7 @@
       "home_score": 23,
       "away_score": 22,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.959Z"
+      "updated_at": "2026-11-11T00:57:56.244Z"
     },
     {
       "id": "401873040",
@@ -2276,7 +2276,7 @@
       "home_score": 23,
       "away_score": 27,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.907Z"
+      "updated_at": "2026-11-11T00:57:56.191Z"
     },
     {
       "id": "401873041",
@@ -2294,7 +2294,7 @@
       "home_score": 21,
       "away_score": 26,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.012Z"
+      "updated_at": "2026-11-11T00:57:56.297Z"
     },
     {
       "id": "401873042",
@@ -2312,7 +2312,7 @@
       "home_score": 9,
       "away_score": 19,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.943Z"
+      "updated_at": "2026-11-11T00:57:56.227Z"
     },
     {
       "id": "401873043",
@@ -2330,7 +2330,7 @@
       "home_score": 13,
       "away_score": 20,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.994Z"
+      "updated_at": "2026-11-11T00:57:56.279Z"
     },
     {
       "id": "401873044",
@@ -2348,7 +2348,7 @@
       "home_score": 11,
       "away_score": 19,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.977Z"
+      "updated_at": "2026-11-11T00:57:56.262Z"
     },
     {
       "id": "401873045",
@@ -2366,7 +2366,7 @@
       "home_score": 35,
       "away_score": 12,
       "final": true,
-      "updated_at": "2026-11-10T13:11:16.924Z"
+      "updated_at": "2026-11-11T00:57:56.209Z"
     },
     {
       "id": "401873046",
@@ -2384,7 +2384,7 @@
       "home_score": 22,
       "away_score": 44,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.029Z"
+      "updated_at": "2026-11-11T00:57:56.315Z"
     },
     {
       "id": "401873047",
@@ -2402,7 +2402,7 @@
       "home_score": 38,
       "away_score": 17,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.063Z"
+      "updated_at": "2026-11-11T00:57:56.349Z"
     },
     {
       "id": "401873048",
@@ -2420,7 +2420,7 @@
       "home_score": 17,
       "away_score": 3,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.081Z"
+      "updated_at": "2026-11-11T00:57:56.369Z"
     },
     {
       "id": "401873049",
@@ -2438,7 +2438,7 @@
       "home_score": 27,
       "away_score": 45,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.047Z"
+      "updated_at": "2026-11-11T00:57:56.332Z"
     },
     {
       "id": "401873050",
@@ -2456,7 +2456,7 @@
       "home_score": 27,
       "away_score": 24,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.098Z"
+      "updated_at": "2026-11-11T00:57:56.389Z"
     },
     {
       "id": "401873051",
@@ -2474,7 +2474,7 @@
       "home_score": 6,
       "away_score": 23,
       "final": true,
-      "updated_at": "2026-11-10T13:11:17.116Z"
+      "updated_at": "2026-11-11T00:57:56.407Z"
     },
     {
       "id": "401873052",
@@ -2485,14 +2485,14 @@
       "away_team": "WSH",
       "home_name": "Giants",
       "away_name": "Commanders",
-      "spread_home": "-2.5",
-      "spread_updated_at": "2026-11-10T04:42:12.173Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.176Z"
+      "spread_home": "-1.5",
+      "spread_updated_at": "2026-11-12T23:30:15.901Z",
+      "locked_spread_home": "-2.5",
+      "spread_locked_at": "2026-11-12T15:00:00.000Z",
+      "home_score": 21,
+      "away_score": 24,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.582Z"
     },
     {
       "id": "401873053",
@@ -2504,13 +2504,13 @@
       "home_name": "Lions",
       "away_name": "Patriots",
       "spread_home": "-2.5",
-      "spread_updated_at": "2026-11-10T04:42:12.216Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.193Z"
+      "spread_updated_at": "2026-11-15T04:54:43.336Z",
+      "locked_spread_home": "-2.5",
+      "spread_locked_at": "2026-11-15T12:00:00.000Z",
+      "home_score": 35,
+      "away_score": 10,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.620Z"
     },
     {
       "id": "401873054",
@@ -2522,13 +2522,13 @@
       "home_name": "Jets",
       "away_name": "Bills",
       "spread_home": "8.5",
-      "spread_updated_at": "2026-11-10T04:42:12.415Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.315Z"
+      "spread_updated_at": "2026-11-15T12:07:17.785Z",
+      "locked_spread_home": "8.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 12,
+      "away_score": 31,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.751Z"
     },
     {
       "id": "401873055",
@@ -2540,13 +2540,13 @@
       "home_name": "Saints",
       "away_name": "Panthers",
       "spread_home": "-1.5",
-      "spread_updated_at": "2026-11-10T04:42:12.384Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.298Z"
+      "spread_updated_at": "2026-11-15T04:15:42.976Z",
+      "locked_spread_home": "-1.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 17,
+      "away_score": 20,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.732Z"
     },
     {
       "id": "401873056",
@@ -2558,13 +2558,13 @@
       "home_name": "Browns",
       "away_name": "Texans",
       "spread_home": "4.5",
-      "spread_updated_at": "2026-11-10T04:42:12.277Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.228Z"
+      "spread_updated_at": "2026-11-11T22:24:49.546Z",
+      "locked_spread_home": "4.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 27,
+      "away_score": 24,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.657Z"
     },
     {
       "id": "401873057",
@@ -2577,12 +2577,12 @@
       "away_name": "Jaguars",
       "spread_home": "10.5",
       "spread_updated_at": "2026-11-10T13:07:14.310Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.263Z"
+      "locked_spread_home": "10.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 23,
+      "away_score": 40,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.694Z"
     },
     {
       "id": "401873058",
@@ -2593,14 +2593,14 @@
       "away_team": "KC",
       "home_name": "Falcons",
       "away_name": "Chiefs",
-      "spread_home": "3.5",
-      "spread_updated_at": "2026-11-10T04:42:12.246Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.212Z"
+      "spread_home": "3.0",
+      "spread_updated_at": "2026-11-12T03:12:01.846Z",
+      "locked_spread_home": "3.0",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 13,
+      "away_score": 35,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.639Z"
     },
     {
       "id": "401873059",
@@ -2611,14 +2611,14 @@
       "away_team": "MIA",
       "home_name": "Colts",
       "away_name": "Dolphins",
-      "spread_home": "-2.5",
-      "spread_updated_at": "2026-11-10T04:42:12.354Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.281Z"
+      "spread_home": "-4.5",
+      "spread_updated_at": "2026-11-14T19:59:32.472Z",
+      "locked_spread_home": "-4.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 24,
+      "away_score": 22,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.713Z"
     },
     {
       "id": "401873060",
@@ -2629,14 +2629,14 @@
       "away_team": "MIN",
       "home_name": "Packers",
       "away_name": "Vikings",
-      "spread_home": "-4.5",
-      "spread_updated_at": "2026-11-10T04:55:42.824Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.247Z"
+      "spread_home": "-2.5",
+      "spread_updated_at": "2026-11-14T08:28:57.560Z",
+      "locked_spread_home": "-2.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 10,
+      "away_score": 30,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.676Z"
     },
     {
       "id": "401873061",
@@ -2647,14 +2647,14 @@
       "away_team": "LAR",
       "home_name": "Cardinals",
       "away_name": "Rams",
-      "spread_home": "9.5",
-      "spread_updated_at": "2026-11-10T04:42:12.476Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.350Z"
+      "spread_home": "10.0",
+      "spread_updated_at": "2026-11-15T20:37:24.201Z",
+      "locked_spread_home": "9.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 6,
+      "away_score": 34,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.787Z"
     },
     {
       "id": "401873062",
@@ -2665,14 +2665,14 @@
       "away_team": "SEA",
       "home_name": "Raiders",
       "away_name": "Seahawks",
-      "spread_home": "3.5",
-      "spread_updated_at": "2026-11-10T04:42:12.446Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.332Z"
+      "spread_home": "6.5",
+      "spread_updated_at": "2026-11-11T00:57:56.691Z",
+      "locked_spread_home": "6.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 13,
+      "away_score": 21,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.769Z"
     },
     {
       "id": "401873063",
@@ -2683,14 +2683,14 @@
       "away_team": "SF",
       "home_name": "Cowboys",
       "away_name": "49ers",
-      "spread_home": "3.5",
-      "spread_updated_at": "2026-11-10T04:42:12.507Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.366Z"
+      "spread_home": "4.5",
+      "spread_updated_at": "2026-11-15T12:07:17.867Z",
+      "locked_spread_home": "4.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 40,
+      "away_score": 46,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.804Z"
     },
     {
       "id": "401873064",
@@ -2701,14 +2701,14 @@
       "away_team": "PIT",
       "home_name": "Bengals",
       "away_name": "Steelers",
-      "spread_home": "-3.5",
-      "spread_updated_at": "2026-11-10T04:42:12.538Z",
-      "locked_spread_home": null,
-      "spread_locked_at": null,
-      "home_score": null,
-      "away_score": null,
-      "final": false,
-      "updated_at": "2026-11-10T13:11:17.384Z"
+      "spread_home": "-4.5",
+      "spread_updated_at": "2026-11-16T01:13:49.592Z",
+      "locked_spread_home": "-3.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 38,
+      "away_score": 18,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.827Z"
     },
     {
       "id": "401873065",
@@ -2719,14 +2719,248 @@
       "away_team": "LAC",
       "home_name": "Ravens",
       "away_name": "Chargers",
-      "spread_home": "-5.5",
-      "spread_updated_at": "2026-11-10T04:42:12.568Z",
+      "spread_home": "-4.5",
+      "spread_updated_at": "2026-11-10T21:25:45.424Z",
+      "locked_spread_home": "-4.5",
+      "spread_locked_at": "2026-11-15T15:00:00.000Z",
+      "home_score": 20,
+      "away_score": 23,
+      "final": true,
+      "updated_at": "2026-11-17T14:43:51.849Z"
+    },
+    {
+      "id": "401873066",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-20T01:15:00.000Z",
+      "home_team": "HOU",
+      "away_team": "IND",
+      "home_name": "Texans",
+      "away_name": "Colts",
+      "spread_home": "-12.5",
+      "spread_updated_at": "2026-11-17T12:14:03.754Z",
       "locked_spread_home": null,
       "spread_locked_at": null,
       "home_score": null,
       "away_score": null,
       "final": false,
-      "updated_at": "2026-11-10T13:11:17.400Z"
+      "updated_at": "2026-11-17T14:43:51.910Z"
+    },
+    {
+      "id": "401873067",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "KC",
+      "away_team": "ARI",
+      "home_name": "Chiefs",
+      "away_name": "Cardinals",
+      "spread_home": "-16.5",
+      "spread_updated_at": "2026-11-17T05:26:08.732Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.000Z"
+    },
+    {
+      "id": "401873068",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "CAR",
+      "away_team": "BAL",
+      "home_name": "Panthers",
+      "away_name": "Ravens",
+      "spread_home": "-2.5",
+      "spread_updated_at": "2026-11-17T05:26:08.804Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.035Z"
+    },
+    {
+      "id": "401873070",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "BUF",
+      "away_team": "MIA",
+      "home_name": "Bills",
+      "away_name": "Dolphins",
+      "spread_home": "-16.5",
+      "spread_updated_at": "2026-11-17T05:26:08.581Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:51.927Z"
+    },
+    {
+      "id": "401873071",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "CHI",
+      "away_team": "NO",
+      "home_name": "Bears",
+      "away_name": "Saints",
+      "spread_home": "-11.5",
+      "spread_updated_at": "2026-11-17T05:26:08.617Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:51.945Z"
+    },
+    {
+      "id": "401873072",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "DET",
+      "away_team": "TB",
+      "home_name": "Lions",
+      "away_name": "Buccaneers",
+      "spread_home": "-6.5",
+      "spread_updated_at": "2026-11-17T05:26:08.696Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:51.981Z"
+    },
+    {
+      "id": "401873073",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "DAL",
+      "away_team": "TEN",
+      "home_name": "Cowboys",
+      "away_name": "Titans",
+      "spread_home": "-8.5",
+      "spread_updated_at": "2026-11-17T05:26:08.659Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:51.963Z"
+    },
+    {
+      "id": "401873076",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T18:00:00.000Z",
+      "home_team": "PHI",
+      "away_team": "PIT",
+      "home_name": "Eagles",
+      "away_name": "Steelers",
+      "spread_home": "4.5",
+      "spread_updated_at": "2026-11-17T05:26:08.768Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.017Z"
+    },
+    {
+      "id": "401873074",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T21:05:00.000Z",
+      "home_team": "LAC",
+      "away_team": "NYJ",
+      "home_name": "Chargers",
+      "away_name": "Jets",
+      "spread_home": "-3.5",
+      "spread_updated_at": "2026-11-17T14:43:52.053Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.053Z"
+    },
+    {
+      "id": "401873069",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T21:25:00.000Z",
+      "home_team": "NYG",
+      "away_team": "JAX",
+      "home_name": "Giants",
+      "away_name": "Jaguars",
+      "spread_home": "6.0",
+      "spread_updated_at": "2026-11-17T05:26:08.913Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.120Z"
+    },
+    {
+      "id": "401873075",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-22T21:25:00.000Z",
+      "home_team": "DEN",
+      "away_team": "LV",
+      "home_name": "Broncos",
+      "away_name": "Raiders",
+      "spread_home": "-10.0",
+      "spread_updated_at": "2026-11-17T05:26:08.877Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.101Z"
+    },
+    {
+      "id": "401873077",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-23T01:20:00.000Z",
+      "home_team": "SF",
+      "away_team": "MIN",
+      "home_name": "49ers",
+      "away_name": "Vikings",
+      "spread_home": "-3.0",
+      "spread_updated_at": "2026-11-17T05:26:08.949Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.138Z"
+    },
+    {
+      "id": "401873078",
+      "season": 2026,
+      "week": 11,
+      "kickoff": "2026-11-24T01:15:00.000Z",
+      "home_team": "WSH",
+      "away_team": "CIN",
+      "home_name": "Commanders",
+      "away_name": "Bengals",
+      "spread_home": "6.5",
+      "spread_updated_at": "2026-11-17T05:26:08.985Z",
+      "locked_spread_home": null,
+      "spread_locked_at": null,
+      "home_score": null,
+      "away_score": null,
+      "final": false,
+      "updated_at": "2026-11-17T14:43:52.158Z"
     }
   ],
   "picks": [
@@ -3676,6 +3910,104 @@
       "updated_at": "2026-11-07T22:14:23.415Z"
     },
     {
+      "player_id": "dad",
+      "game_id": "401873052",
+      "side": "home",
+      "created_at": "2026-11-13T00:12:45.851Z",
+      "updated_at": "2026-11-13T00:12:45.851Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873053",
+      "side": "home",
+      "created_at": "2026-11-14T12:40:45.959Z",
+      "updated_at": "2026-11-14T12:40:45.959Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873054",
+      "side": "away",
+      "created_at": "2026-11-14T12:40:50.729Z",
+      "updated_at": "2026-11-14T12:40:50.729Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873055",
+      "side": "home",
+      "created_at": "2026-11-14T12:40:53.331Z",
+      "updated_at": "2026-11-14T12:40:53.331Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873056",
+      "side": "away",
+      "created_at": "2026-11-14T12:40:59.791Z",
+      "updated_at": "2026-11-14T12:40:59.791Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873057",
+      "side": "away",
+      "created_at": "2026-11-14T12:41:03.137Z",
+      "updated_at": "2026-11-14T12:41:03.137Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873058",
+      "side": "home",
+      "created_at": "2026-11-14T12:41:06.550Z",
+      "updated_at": "2026-11-14T12:41:06.550Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873059",
+      "side": "away",
+      "created_at": "2026-11-14T12:41:11.734Z",
+      "updated_at": "2026-11-14T12:41:11.734Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873060",
+      "side": "home",
+      "created_at": "2026-11-14T12:41:17.883Z",
+      "updated_at": "2026-11-14T12:41:17.883Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873061",
+      "side": "home",
+      "created_at": "2026-11-14T12:41:26.804Z",
+      "updated_at": "2026-11-14T12:41:26.804Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873062",
+      "side": "home",
+      "created_at": "2026-11-14T12:41:33.668Z",
+      "updated_at": "2026-11-14T12:41:33.668Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873063",
+      "side": "home",
+      "created_at": "2026-11-14T12:41:47.909Z",
+      "updated_at": "2026-11-14T12:41:47.909Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873064",
+      "side": "away",
+      "created_at": "2026-11-14T12:41:56.705Z",
+      "updated_at": "2026-11-14T12:41:56.705Z"
+    },
+    {
+      "player_id": "dad",
+      "game_id": "401873065",
+      "side": "home",
+      "created_at": "2026-11-14T12:42:03.563Z",
+      "updated_at": "2026-11-14T12:42:03.563Z"
+    },
+    {
       "player_id": "john",
       "game_id": "401872656",
       "side": "home",
@@ -4591,6 +4923,34 @@
       "side": "away",
       "created_at": "2026-11-08T15:26:30.110Z",
       "updated_at": "2026-11-08T15:26:30.110Z"
+    },
+    {
+      "player_id": "john",
+      "game_id": "401873052",
+      "side": "home",
+      "created_at": "2026-11-13T00:19:21.135Z",
+      "updated_at": "2026-11-13T00:19:21.135Z"
+    },
+    {
+      "player_id": "john",
+      "game_id": "401873053",
+      "side": "home",
+      "created_at": "2026-11-15T04:54:49.074Z",
+      "updated_at": "2026-11-15T04:54:49.074Z"
+    },
+    {
+      "player_id": "john",
+      "game_id": "401873064",
+      "side": "away",
+      "created_at": "2026-11-15T22:11:31.586Z",
+      "updated_at": "2026-11-15T22:11:31.586Z"
+    },
+    {
+      "player_id": "john",
+      "game_id": "401873065",
+      "side": "home",
+      "created_at": "2026-11-15T22:11:33.620Z",
+      "updated_at": "2026-11-15T22:11:33.620Z"
     },
     {
       "player_id": "nick",
@@ -5543,6 +5903,104 @@
       "side": "away",
       "created_at": "2026-11-06T02:45:11.035Z",
       "updated_at": "2026-11-06T02:45:11.035Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873052",
+      "side": "home",
+      "created_at": "2026-11-12T18:10:39.588Z",
+      "updated_at": "2026-11-12T23:30:16.008Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873053",
+      "side": "home",
+      "created_at": "2026-11-12T17:34:31.255Z",
+      "updated_at": "2026-11-12T17:34:31.255Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873054",
+      "side": "away",
+      "created_at": "2026-11-12T17:34:39.514Z",
+      "updated_at": "2026-11-12T17:34:39.514Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873055",
+      "side": "away",
+      "created_at": "2026-11-12T18:12:45.666Z",
+      "updated_at": "2026-11-12T18:12:45.666Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873056",
+      "side": "away",
+      "created_at": "2026-11-12T17:34:46.930Z",
+      "updated_at": "2026-11-12T17:34:46.930Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873057",
+      "side": "away",
+      "created_at": "2026-11-12T17:34:48.866Z",
+      "updated_at": "2026-11-12T17:34:48.866Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873058",
+      "side": "away",
+      "created_at": "2026-11-12T17:34:50.856Z",
+      "updated_at": "2026-11-12T17:34:50.856Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873059",
+      "side": "home",
+      "created_at": "2026-11-12T18:15:08.892Z",
+      "updated_at": "2026-11-12T18:15:08.892Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873060",
+      "side": "home",
+      "created_at": "2026-11-12T18:13:12.246Z",
+      "updated_at": "2026-11-12T18:13:12.246Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873061",
+      "side": "home",
+      "created_at": "2026-11-12T17:35:45.427Z",
+      "updated_at": "2026-11-12T17:35:45.427Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873062",
+      "side": "away",
+      "created_at": "2026-11-12T17:35:18.543Z",
+      "updated_at": "2026-11-12T17:35:18.543Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873063",
+      "side": "away",
+      "created_at": "2026-11-12T17:35:21.874Z",
+      "updated_at": "2026-11-12T17:35:21.874Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873064",
+      "side": "home",
+      "created_at": "2026-11-12T17:35:36.843Z",
+      "updated_at": "2026-11-12T17:35:36.843Z"
+    },
+    {
+      "player_id": "nick",
+      "game_id": "401873065",
+      "side": "home",
+      "created_at": "2026-11-12T17:35:25.806Z",
+      "updated_at": "2026-11-12T17:35:25.806Z"
     }
   ],
   "weeklyBonuses": [
@@ -6085,6 +6543,66 @@
       "side": "away",
       "created_at": "2026-11-07T20:22:44.441Z",
       "updated_at": "2026-11-07T20:22:44.441Z"
+    },
+    {
+      "player_id": "dad",
+      "season": 2026,
+      "week": 10,
+      "kind": "lock",
+      "game_id": "401873054",
+      "side": "away",
+      "created_at": "2026-11-14T12:42:13.327Z",
+      "updated_at": "2026-11-14T12:42:13.327Z"
+    },
+    {
+      "player_id": "dad",
+      "season": 2026,
+      "week": 10,
+      "kind": "upset",
+      "game_id": "401873059",
+      "side": "away",
+      "created_at": "2026-11-14T12:42:43.856Z",
+      "updated_at": "2026-11-14T12:42:43.856Z"
+    },
+    {
+      "player_id": "john",
+      "season": 2026,
+      "week": 10,
+      "kind": "lock",
+      "game_id": "401873065",
+      "side": "home",
+      "created_at": "2026-11-15T22:11:55.983Z",
+      "updated_at": "2026-11-15T22:11:55.983Z"
+    },
+    {
+      "player_id": "john",
+      "season": 2026,
+      "week": 10,
+      "kind": "upset",
+      "game_id": "401873064",
+      "side": "away",
+      "created_at": "2026-11-15T22:11:57.947Z",
+      "updated_at": "2026-11-15T22:11:57.947Z"
+    },
+    {
+      "player_id": "nick",
+      "season": 2026,
+      "week": 10,
+      "kind": "lock",
+      "game_id": "401873057",
+      "side": "away",
+      "created_at": "2026-11-12T18:17:25.411Z",
+      "updated_at": "2026-11-12T18:17:25.411Z"
+    },
+    {
+      "player_id": "nick",
+      "season": 2026,
+      "week": 10,
+      "kind": "upset",
+      "game_id": "401873055",
+      "side": "away",
+      "created_at": "2026-11-12T18:18:18.729Z",
+      "updated_at": "2026-11-12T23:30:21.361Z"
     }
   ],
   "lineSnapshots": [
@@ -8789,10 +9307,52 @@
       "captured_at": "2026-11-10T04:42:12.198Z"
     },
     {
+      "id": "483",
+      "game_id": "401873052",
+      "spread_home": "-1.5",
+      "captured_at": "2026-11-12T18:13:37.109Z"
+    },
+    {
+      "id": "484",
+      "game_id": "401873052",
+      "spread_home": "-2.5",
+      "captured_at": "2026-11-12T19:24:31.662Z"
+    },
+    {
+      "id": "485",
+      "game_id": "401873052",
+      "spread_home": "-1.5",
+      "captured_at": "2026-11-12T23:30:15.924Z"
+    },
+    {
       "id": "451",
       "game_id": "401873053",
       "spread_home": "-2.5",
       "captured_at": "2026-11-10T04:42:12.238Z"
+    },
+    {
+      "id": "486",
+      "game_id": "401873053",
+      "spread_home": "-3.0",
+      "captured_at": "2026-11-13T21:45:12.854Z"
+    },
+    {
+      "id": "487",
+      "game_id": "401873053",
+      "spread_home": "-2.5",
+      "captured_at": "2026-11-14T01:55:42.013Z"
+    },
+    {
+      "id": "493",
+      "game_id": "401873053",
+      "spread_home": "-3.0",
+      "captured_at": "2026-11-15T04:15:42.859Z"
+    },
+    {
+      "id": "495",
+      "game_id": "401873053",
+      "spread_home": "-2.5",
+      "captured_at": "2026-11-15T04:54:43.351Z"
     },
     {
       "id": "457",
@@ -8801,16 +9361,52 @@
       "captured_at": "2026-11-10T04:42:12.437Z"
     },
     {
+      "id": "491",
+      "game_id": "401873054",
+      "spread_home": "7.5",
+      "captured_at": "2026-11-14T19:59:32.553Z"
+    },
+    {
+      "id": "496",
+      "game_id": "401873054",
+      "spread_home": "8.5",
+      "captured_at": "2026-11-15T12:07:17.805Z"
+    },
+    {
       "id": "456",
       "game_id": "401873055",
       "spread_home": "-1.5",
       "captured_at": "2026-11-10T04:42:12.406Z"
     },
     {
+      "id": "473",
+      "game_id": "401873055",
+      "spread_home": "-2.5",
+      "captured_at": "2026-11-11T00:57:56.644Z"
+    },
+    {
+      "id": "494",
+      "game_id": "401873055",
+      "spread_home": "-1.5",
+      "captured_at": "2026-11-15T04:15:42.993Z"
+    },
+    {
       "id": "453",
       "game_id": "401873056",
       "spread_home": "4.5",
       "captured_at": "2026-11-10T04:42:12.299Z"
+    },
+    {
+      "id": "477",
+      "game_id": "401873056",
+      "spread_home": "5.5",
+      "captured_at": "2026-11-11T15:45:29.831Z"
+    },
+    {
+      "id": "478",
+      "game_id": "401873056",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-11T22:24:49.561Z"
     },
     {
       "id": "454",
@@ -8831,10 +9427,28 @@
       "captured_at": "2026-11-10T04:42:12.268Z"
     },
     {
+      "id": "481",
+      "game_id": "401873058",
+      "spread_home": "3.0",
+      "captured_at": "2026-11-12T03:12:01.865Z"
+    },
+    {
       "id": "455",
       "game_id": "401873059",
       "spread_home": "-2.5",
       "captured_at": "2026-11-10T04:42:12.375Z"
+    },
+    {
+      "id": "471",
+      "game_id": "401873059",
+      "spread_home": "-3.5",
+      "captured_at": "2026-11-10T21:25:45.281Z"
+    },
+    {
+      "id": "490",
+      "game_id": "401873059",
+      "spread_home": "-4.5",
+      "captured_at": "2026-11-14T19:59:32.492Z"
     },
     {
       "id": "463",
@@ -8843,10 +9457,40 @@
       "captured_at": "2026-11-10T04:55:42.841Z"
     },
     {
+      "id": "465",
+      "game_id": "401873060",
+      "spread_home": "-5.5",
+      "captured_at": "2026-11-10T19:16:24.955Z"
+    },
+    {
+      "id": "468",
+      "game_id": "401873060",
+      "spread_home": "-3.5",
+      "captured_at": "2026-11-10T20:31:13.291Z"
+    },
+    {
+      "id": "479",
+      "game_id": "401873060",
+      "spread_home": "-3.0",
+      "captured_at": "2026-11-11T22:24:49.602Z"
+    },
+    {
+      "id": "489",
+      "game_id": "401873060",
+      "spread_home": "-2.5",
+      "captured_at": "2026-11-14T08:28:57.576Z"
+    },
+    {
       "id": "459",
       "game_id": "401873061",
       "spread_home": "9.5",
       "captured_at": "2026-11-10T04:42:12.498Z"
+    },
+    {
+      "id": "498",
+      "game_id": "401873061",
+      "spread_home": "10.0",
+      "captured_at": "2026-11-15T20:37:24.218Z"
     },
     {
       "id": "458",
@@ -8855,10 +9499,82 @@
       "captured_at": "2026-11-10T04:42:12.467Z"
     },
     {
+      "id": "466",
+      "game_id": "401873062",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-10T19:16:25.056Z"
+    },
+    {
+      "id": "469",
+      "game_id": "401873062",
+      "spread_home": "6.0",
+      "captured_at": "2026-11-10T20:31:13.406Z"
+    },
+    {
+      "id": "474",
+      "game_id": "401873062",
+      "spread_home": "6.5",
+      "captured_at": "2026-11-11T00:57:56.708Z"
+    },
+    {
       "id": "460",
       "game_id": "401873063",
       "spread_home": "3.5",
       "captured_at": "2026-11-10T04:42:12.529Z"
+    },
+    {
+      "id": "467",
+      "game_id": "401873063",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-10T19:16:25.103Z"
+    },
+    {
+      "id": "470",
+      "game_id": "401873063",
+      "spread_home": "3.5",
+      "captured_at": "2026-11-10T20:31:13.457Z"
+    },
+    {
+      "id": "475",
+      "game_id": "401873063",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-11T00:57:56.760Z"
+    },
+    {
+      "id": "476",
+      "game_id": "401873063",
+      "spread_home": "3.5",
+      "captured_at": "2026-11-11T07:31:50.322Z"
+    },
+    {
+      "id": "480",
+      "game_id": "401873063",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-11T22:24:49.727Z"
+    },
+    {
+      "id": "482",
+      "game_id": "401873063",
+      "spread_home": "3.5",
+      "captured_at": "2026-11-12T03:12:02.040Z"
+    },
+    {
+      "id": "488",
+      "game_id": "401873063",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-14T01:55:42.201Z"
+    },
+    {
+      "id": "492",
+      "game_id": "401873063",
+      "spread_home": "3.5",
+      "captured_at": "2026-11-14T19:59:32.618Z"
+    },
+    {
+      "id": "497",
+      "game_id": "401873063",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-15T12:07:17.883Z"
     },
     {
       "id": "461",
@@ -8867,20 +9583,122 @@
       "captured_at": "2026-11-10T04:42:12.560Z"
     },
     {
+      "id": "499",
+      "game_id": "401873064",
+      "spread_home": "-4.5",
+      "captured_at": "2026-11-16T01:13:49.611Z"
+    },
+    {
       "id": "462",
       "game_id": "401873065",
       "spread_home": "-5.5",
       "captured_at": "2026-11-10T04:42:12.590Z"
+    },
+    {
+      "id": "472",
+      "game_id": "401873065",
+      "spread_home": "-4.5",
+      "captured_at": "2026-11-10T21:25:45.441Z"
+    },
+    {
+      "id": "500",
+      "game_id": "401873066",
+      "spread_home": "-11.5",
+      "captured_at": "2026-11-17T05:26:08.559Z"
+    },
+    {
+      "id": "513",
+      "game_id": "401873066",
+      "spread_home": "-12.5",
+      "captured_at": "2026-11-17T12:14:03.770Z"
+    },
+    {
+      "id": "505",
+      "game_id": "401873067",
+      "spread_home": "-16.5",
+      "captured_at": "2026-11-17T05:26:08.758Z"
+    },
+    {
+      "id": "507",
+      "game_id": "401873068",
+      "spread_home": "-2.5",
+      "captured_at": "2026-11-17T05:26:08.831Z"
+    },
+    {
+      "id": "510",
+      "game_id": "401873069",
+      "spread_home": "6.0",
+      "captured_at": "2026-11-17T05:26:08.940Z"
+    },
+    {
+      "id": "501",
+      "game_id": "401873070",
+      "spread_home": "-16.5",
+      "captured_at": "2026-11-17T05:26:08.607Z"
+    },
+    {
+      "id": "502",
+      "game_id": "401873071",
+      "spread_home": "-11.5",
+      "captured_at": "2026-11-17T05:26:08.650Z"
+    },
+    {
+      "id": "504",
+      "game_id": "401873072",
+      "spread_home": "-6.5",
+      "captured_at": "2026-11-17T05:26:08.722Z"
+    },
+    {
+      "id": "503",
+      "game_id": "401873073",
+      "spread_home": "-8.5",
+      "captured_at": "2026-11-17T05:26:08.686Z"
+    },
+    {
+      "id": "508",
+      "game_id": "401873074",
+      "spread_home": "-3.0",
+      "captured_at": "2026-11-17T05:26:08.867Z"
+    },
+    {
+      "id": "514",
+      "game_id": "401873074",
+      "spread_home": "-3.5",
+      "captured_at": "2026-11-17T14:43:52.071Z"
+    },
+    {
+      "id": "509",
+      "game_id": "401873075",
+      "spread_home": "-10.0",
+      "captured_at": "2026-11-17T05:26:08.903Z"
+    },
+    {
+      "id": "506",
+      "game_id": "401873076",
+      "spread_home": "4.5",
+      "captured_at": "2026-11-17T05:26:08.794Z"
+    },
+    {
+      "id": "511",
+      "game_id": "401873077",
+      "spread_home": "-3.0",
+      "captured_at": "2026-11-17T05:26:08.976Z"
+    },
+    {
+      "id": "512",
+      "game_id": "401873078",
+      "spread_home": "6.5",
+      "captured_at": "2026-11-17T05:26:09.011Z"
     }
   ],
   "appMeta": [
     {
       "key": "current_week",
-      "value": "2026:10"
+      "value": "2026:11"
     },
     {
       "key": "last_live_sync",
-      "value": "1794276750086"
+      "value": "1794885909407"
     }
   ]
 }
